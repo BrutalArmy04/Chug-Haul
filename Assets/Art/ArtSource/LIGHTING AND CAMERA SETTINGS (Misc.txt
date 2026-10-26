@@ -1,0 +1,47 @@
+LIGHTING AND CAMERA SETTINGS (Misc role)
+
+Unity 6, Universal 3D (URP) template. Map: 60 x 43 units.
+
+Things to set up yourself: 
+
+1. MAIN CAMERA (Far view)
+   Position (0, 52, -52)   Rotation (45, 0, 0)   Field of View 30
+   Clipping Planes Near 0.3, Far 500
+   Rendering > Post Processing: TICKED (nothing in the Volume works without it)
+   Environment > Background Type: Solid Color, #8FD0F5
+
+2. AMBIENT AND FOG   (Window > Rendering > Lighting > Environment OR Ctrl 9)
+   Environment Lighting Source: Gradient
+     Sky      #9CC4E8 (Red: 156, Green: 196, Blue: 232)
+     Equator  #C9D2B8 (Red: 201, Green: 210, Blue: 184)
+     Ground   #6E7F55 (Red: 110, Green: 127, Blue: 85)
+
+   Environment Reflections Intensity Multiplier: 0
+   Fog (Other Settings): On, Mode Linear, Color #CFE3F0, Start 60, End 170
+
+3. URP ASSET (Assets/Settings/PC_RPAsset, and check which asset Quality uses)
+   HDR On, Anti-aliasing (MSAA) 4x
+   Main Light: Per Pixel, Cast Shadows On, Main Light shadow resolution 4096 (use 2048 if the PC is slow)
+   Shadows: Max Distance 90, Cascade Count 3, Soft Shadows On
+
+
+Things which are already in the packages: 
+
+1. DIRECTIONAL LIGHT (already inside Lighting_Rig)
+   Rotation      X 38, Y 30, Z 0
+   Color         #FFE2B8
+   Intensity     1.5
+   Shadow Type   Soft Shadows, Strength 0.85
+
+2. GLOBAL VOLUME (already inside Lighting_Rig")
+   Mode Global, Weight 1, Priority 0
+   Tonemapping        Mode Neutral
+   Bloom              Threshold 1.1, Intensity 0.25, Scatter 0.6
+   Color Adjustments  Post Exposure 0.2, Contrast 15, Saturation 12
+   Vignette           Intensity 0.25, Smoothness 0.4
+   Depth of Field     optional, Gaussian, Start 70, End 110, Max Radius 1
+
+3. MAPGROUND
+   Position (0, 0, 0)   Rotation (0, 180, 0)   Scale (6, 1, 4.3)
+   Material M_MapGround: Universal Render Pipeline/Lit, Smoothness 0, Metallic 0,
+   Base Map = Romanian_Map.png
