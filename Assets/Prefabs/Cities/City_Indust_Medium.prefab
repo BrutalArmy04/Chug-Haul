@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4283515030675139451}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: LabelAnchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -40,7 +40,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6829164504681076713}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -118,7 +118,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4925644963427011106}
   - component: {fileID: 8579661657791681355}
-  m_Layer: 0
+  - component: {fileID: 3395975236957227369}
+  m_Layer: 3
   m_Name: City_Indust_Medium
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -163,6 +164,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 5.8, y: 1.8, z: 3.2}
   m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!114 &3395975236957227369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4738098431915879535}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4078cc8a1352b4045961093eb188b898, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ChugHaul.View::ChugHaul.View.NodeView
+  hoverColor: {r: 1, g: 0.95, b: 0.5, a: 1}
+  selectedColor: {r: 0.5, g: 1, b: 0.6, a: 1}
+  tintAmount: 0.45
 --- !u!1001 &417475086657643945
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -226,6 +242,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 773141ba143b4c84a81ff730ce6b8f26, type: 3}
       propertyPath: m_Name
       value: detail-tank-large (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 773141ba143b4c84a81ff730ce6b8f26, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -301,6 +321,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-o (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: d654dfb5804b5d64895668c9bf4e0dbd, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -374,6 +398,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 1629e51ae020a3041af40a2d669b5157, type: 3}
       propertyPath: m_Name
       value: building-k (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 1629e51ae020a3041af40a2d669b5157, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -449,6 +477,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-k (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 1629e51ae020a3041af40a2d669b5157, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -523,6 +555,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: solar-panel-landscape-group (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 32f75e41943bb4d468e7c0d438f5e9e1, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -593,9 +629,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -5148914591892728797, guid: 3abf1c0d371399242bdcac22c58855d0, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 3abf1c0d371399242bdcac22c58855d0, type: 3}
       propertyPath: m_Name
       value: windmill
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3abf1c0d371399242bdcac22c58855d0, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -667,9 +711,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -5148914591892728797, guid: 3abf1c0d371399242bdcac22c58855d0, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 3abf1c0d371399242bdcac22c58855d0, type: 3}
       propertyPath: m_Name
       value: windmill (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3abf1c0d371399242bdcac22c58855d0, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -745,6 +797,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-f
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: b30b4755de6927540b87fc85d084449e, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -818,6 +874,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: b8c66378399fd544fab6a78634d5a6ae, type: 3}
       propertyPath: m_Name
       value: building-s (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: b8c66378399fd544fab6a78634d5a6ae, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -893,6 +953,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: shipping-container-a (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: fffdd9ce5007e864cbff8d21196fbbb0, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -966,6 +1030,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: e74fd6e37cda2c54c91d02b790e7e919, type: 3}
       propertyPath: m_Name
       value: building-t (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e74fd6e37cda2c54c91d02b790e7e919, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1041,6 +1109,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-s (7)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: b8c66378399fd544fab6a78634d5a6ae, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1114,6 +1186,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 91ffbe8c908f230429d0ef9942e18158, type: 3}
       propertyPath: m_Name
       value: chimney-medium
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 91ffbe8c908f230429d0ef9942e18158, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1189,6 +1265,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: solar-panel-landscape-group (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 32f75e41943bb4d468e7c0d438f5e9e1, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1262,6 +1342,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: fffdd9ce5007e864cbff8d21196fbbb0, type: 3}
       propertyPath: m_Name
       value: shipping-container-a
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: fffdd9ce5007e864cbff8d21196fbbb0, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1337,6 +1421,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-s (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: b8c66378399fd544fab6a78634d5a6ae, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1410,6 +1498,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: e1a6fb283aba07d4980a5de95c7cd93e, type: 3}
       propertyPath: m_Name
       value: building-b
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e1a6fb283aba07d4980a5de95c7cd93e, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1485,6 +1577,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-m (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 76622a813c9fda243b0b9f5e7c412d70, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1555,9 +1651,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -5148914591892728797, guid: 3abf1c0d371399242bdcac22c58855d0, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 3abf1c0d371399242bdcac22c58855d0, type: 3}
       propertyPath: m_Name
       value: windmill (4)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3abf1c0d371399242bdcac22c58855d0, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1633,6 +1737,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: solar-panel-landscape-group (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 32f75e41943bb4d468e7c0d438f5e9e1, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1706,6 +1814,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 76622a813c9fda243b0b9f5e7c412d70, type: 3}
       propertyPath: m_Name
       value: building-m
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 76622a813c9fda243b0b9f5e7c412d70, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1781,6 +1893,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-t (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e74fd6e37cda2c54c91d02b790e7e919, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1854,6 +1970,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 2f322cc94328c25409c0894362f0cb6c, type: 3}
       propertyPath: m_Name
       value: building-l (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 2f322cc94328c25409c0894362f0cb6c, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1929,6 +2049,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: detail-tank-large (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 773141ba143b4c84a81ff730ce6b8f26, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2002,6 +2126,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 1629e51ae020a3041af40a2d669b5157, type: 3}
       propertyPath: m_Name
       value: building-k (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 1629e51ae020a3041af40a2d669b5157, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2077,6 +2205,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: shipping-container-a (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: fffdd9ce5007e864cbff8d21196fbbb0, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2151,6 +2283,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: shipping-container-a (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: fffdd9ce5007e864cbff8d21196fbbb0, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2221,9 +2357,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -5148914591892728797, guid: 3abf1c0d371399242bdcac22c58855d0, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 3abf1c0d371399242bdcac22c58855d0, type: 3}
       propertyPath: m_Name
       value: windmill (5)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3abf1c0d371399242bdcac22c58855d0, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2299,6 +2443,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-a
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 11626eec95746a247b484028b725d510, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2372,6 +2520,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 11626eec95746a247b484028b725d510, type: 3}
       propertyPath: m_Name
       value: building-a (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 11626eec95746a247b484028b725d510, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2447,6 +2599,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: chimney-large (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0e1835b5a0087504a8236108f049890d, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2521,6 +2677,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-k (3)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 1629e51ae020a3041af40a2d669b5157, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2591,9 +2751,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -5148914591892728797, guid: 3abf1c0d371399242bdcac22c58855d0, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: 3abf1c0d371399242bdcac22c58855d0, type: 3}
       propertyPath: m_Name
       value: windmill (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 3abf1c0d371399242bdcac22c58855d0, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2669,6 +2837,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-k (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 1629e51ae020a3041af40a2d669b5157, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2742,6 +2914,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 1629e51ae020a3041af40a2d669b5157, type: 3}
       propertyPath: m_Name
       value: building-k
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 1629e51ae020a3041af40a2d669b5157, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2817,6 +2993,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-l
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 2f322cc94328c25409c0894362f0cb6c, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2890,6 +3070,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 32f75e41943bb4d468e7c0d438f5e9e1, type: 3}
       propertyPath: m_Name
       value: solar-panel-landscape-group
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 32f75e41943bb4d468e7c0d438f5e9e1, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -2965,6 +3149,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-o
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: d654dfb5804b5d64895668c9bf4e0dbd, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3038,6 +3226,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 2aa4505fbb2b6924eb29134e5dd5a35e, type: 3}
       propertyPath: m_Name
       value: building-d
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 2aa4505fbb2b6924eb29134e5dd5a35e, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3113,6 +3305,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: shipping-container-a (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: fffdd9ce5007e864cbff8d21196fbbb0, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3186,6 +3382,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 0e1835b5a0087504a8236108f049890d, type: 3}
       propertyPath: m_Name
       value: chimney-large (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0e1835b5a0087504a8236108f049890d, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3261,6 +3461,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: solar-panel-landscape-group (2)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 32f75e41943bb4d468e7c0d438f5e9e1, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3334,6 +3538,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: e74fd6e37cda2c54c91d02b790e7e919, type: 3}
       propertyPath: m_Name
       value: building-t
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: e74fd6e37cda2c54c91d02b790e7e919, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -3409,6 +3617,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-o (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: d654dfb5804b5d64895668c9bf4e0dbd, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3483,6 +3695,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-s (6)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: b8c66378399fd544fab6a78634d5a6ae, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -3556,6 +3772,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: b8c66378399fd544fab6a78634d5a6ae, type: 3}
       propertyPath: m_Name
       value: building-s (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: b8c66378399fd544fab6a78634d5a6ae, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
