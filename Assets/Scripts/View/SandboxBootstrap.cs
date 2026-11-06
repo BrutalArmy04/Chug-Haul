@@ -15,7 +15,7 @@ namespace ChugHaul.View
         {
             var state = new GameState(startCoins);
             Network network = TestMap.Create();
-            var rules = new Economy(state, network);
+            var economy = new Economy(state, network);
 
             foreach (var node in network.Nodes)
             {
@@ -39,7 +39,7 @@ namespace ChugHaul.View
                 bar.transform.localScale = new Vector3(0.2f, 0.05f, line.Length - 2f);
             }
 
-            selection.Init(rules);
+            selection.Init(economy);
         }
     }
 }
