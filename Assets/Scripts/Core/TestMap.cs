@@ -5,8 +5,8 @@ namespace ChugHaul.Core
         public static Network Create()
         {
             Node bucharest = new Node(1, "Bucharest", 0, 0);
-            Node brasov = new Node(2, "Brasov", 3, 4);
-            Node sibiu = new Node(3, "Sibiu", 6, 4);
+            Node brasov = new Node(2, "Brasov", 1, 7);
+            Node sibiu = new Node(3, "Sibiu", 8, 7);
             Node cluj = new Node(4, "Cluj", 9, 0);
 
             Line line1 = new Line(1, bucharest, brasov, 20);
