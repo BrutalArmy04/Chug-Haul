@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7469924079409753256}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: LabelAnchor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -41,7 +41,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4150806845199217938}
   - component: {fileID: 8544574417732143476}
-  m_Layer: 0
+  - component: {fileID: -3993248995302973699}
+  m_Layer: 3
   m_Name: City_Indust_Small
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -86,6 +87,21 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 3.2, y: 1.5, z: 3.1}
   m_Center: {x: 0, y: 0.75, z: 0}
+--- !u!114 &-3993248995302973699
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6064725873271399738}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4078cc8a1352b4045961093eb188b898, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ChugHaul.View::ChugHaul.View.NodeView
+  hoverColor: {r: 1, g: 0.95, b: 0.5, a: 1}
+  selectedColor: {r: 0.5, g: 1, b: 0.6, a: 1}
+  tintAmount: 0.45
 --- !u!1 &6532040218415608782
 GameObject:
   m_ObjectHideFlags: 0
@@ -95,7 +111,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9120457319795083892}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -202,6 +218,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-l
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 2f322cc94328c25409c0894362f0cb6c, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -275,6 +295,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 2ade513521d833d4e93e2808644c531c, type: 3}
       propertyPath: m_Name
       value: chimney-small
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 2ade513521d833d4e93e2808644c531c, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -350,6 +374,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-h (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 5742232309906e34c874e73fecf79f8e, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -423,6 +451,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: d8dd3dec628b4b14f9f96b64c6c2dbc0, type: 3}
       propertyPath: m_Name
       value: building-q
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: d8dd3dec628b4b14f9f96b64c6c2dbc0, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -498,6 +530,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-a
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 11626eec95746a247b484028b725d510, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -571,6 +607,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 0fd919e3f9f0a0040b6c1f05e917af30, type: 3}
       propertyPath: m_Name
       value: detail-tank (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0fd919e3f9f0a0040b6c1f05e917af30, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -646,6 +686,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-h
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 5742232309906e34c874e73fecf79f8e, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -719,6 +763,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 4a95ee42ba5adb94cabb5d26ec633418, type: 3}
       propertyPath: m_Name
       value: building-i (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4a95ee42ba5adb94cabb5d26ec633418, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -794,6 +842,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-a (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 11626eec95746a247b484028b725d510, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -867,6 +919,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 0fd919e3f9f0a0040b6c1f05e917af30, type: 3}
       propertyPath: m_Name
       value: detail-tank (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0fd919e3f9f0a0040b6c1f05e917af30, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -942,6 +998,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-i (5)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4a95ee42ba5adb94cabb5d26ec633418, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1015,6 +1075,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 0fd919e3f9f0a0040b6c1f05e917af30, type: 3}
       propertyPath: m_Name
       value: detail-tank (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0fd919e3f9f0a0040b6c1f05e917af30, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1090,6 +1154,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-i
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4a95ee42ba5adb94cabb5d26ec633418, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1163,6 +1231,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 1eef483ceea0d0a43ad22f352f776652, type: 3}
       propertyPath: m_Name
       value: building-g
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 1eef483ceea0d0a43ad22f352f776652, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1238,6 +1310,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: chimney-small (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 2ade513521d833d4e93e2808644c531c, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1311,6 +1387,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 4a95ee42ba5adb94cabb5d26ec633418, type: 3}
       propertyPath: m_Name
       value: building-i (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4a95ee42ba5adb94cabb5d26ec633418, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1386,6 +1466,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-i (6)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4a95ee42ba5adb94cabb5d26ec633418, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1459,6 +1543,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: d654dfb5804b5d64895668c9bf4e0dbd, type: 3}
       propertyPath: m_Name
       value: building-o
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: d654dfb5804b5d64895668c9bf4e0dbd, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1534,6 +1622,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: detail-tank (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0fd919e3f9f0a0040b6c1f05e917af30, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1608,6 +1700,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: building-i (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4a95ee42ba5adb94cabb5d26ec633418, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1681,6 +1777,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 0fd919e3f9f0a0040b6c1f05e917af30, type: 3}
       propertyPath: m_Name
       value: detail-tank
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0fd919e3f9f0a0040b6c1f05e917af30, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
