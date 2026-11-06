@@ -12,13 +12,13 @@ namespace ChugHaul.View
         [SerializeField] LayerMask selectableMask;
         [SerializeField] float maxDistance = 500f;
 
-        Economy rules;                              // replace with the real Core class
+        Economy economy;
         SelectableView hovered, selected;
 
         public event Action<SelectableView> SelectionChanged;
-        public event Action<int, BuyResult> PurchaseAttempted;   // HUD will use this later
+        public event Action<int, BuyResult> PurchaseAttempted;
 
-        public void Init(Economy rules) { this.rules = rules; }
+        public void Init(Economy economy) { this.economy = economy; }
 
         void Awake() { if (cam == null) cam = Camera.main; }
 
@@ -56,9 +56,9 @@ namespace ChugHaul.View
             if (selected != null) selected.SetSelected(true);
             SelectionChanged?.Invoke(selected);
 
-            if (target is LineView line && rules != null)
+            if (target is LineView line && economy != null)
             {
-                BuyResult result = rules.TryBuyLine(line.Id);   // View asks, Core decides
+                BuyResult result = economy.TryBuyLine(line.Id);   // View asks, Core decides
                 Debug.Log($"Line {line.Id}: {result}");
                 PurchaseAttempted?.Invoke(line.Id, result);
             }
