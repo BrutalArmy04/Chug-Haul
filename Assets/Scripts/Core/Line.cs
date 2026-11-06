@@ -8,7 +8,7 @@ namespace ChugHaul.Core
         public Node NodeA { get; }
         public Node NodeB { get; }
         public int Cost { get; }
-        public bool IsActive { get; set; }
+        public bool IsActive { get; private set; }
 
         public float Length { get; }
 
@@ -24,6 +24,10 @@ namespace ChugHaul.Core
             double dz = nodeB.Z - nodeA.Z;
 
             Length = (float)Math.Sqrt(dx * dx + dz * dz);
+        }
+        internal void Activate()
+        {
+            IsActive = true;
         }
     }
 }
