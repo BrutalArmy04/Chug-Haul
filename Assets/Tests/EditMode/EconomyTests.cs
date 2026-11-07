@@ -90,5 +90,64 @@ namespace ChugHaul.Core.Tests
             Assert.That(eventCount, Is.EqualTo(1));
             Assert.That(receivedLine, Is.SameAs(line));
         }
+
+        [Test]
+        public void OnTrainArrived_InactiveLineReturnsZero()
+        {
+            int reward = economy.OnTrainArrived(1);
+
+            Assert.That(reward, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void OnTrainArrived_ActiveLineReturnsReward()
+        {
+            economy.TryBuyLine(1);
+
+            int reward = economy.OnTrainArrived(1);
+
+            // Line length is 5 (distance from (0,0) to (3,4)), default coin rate is 1
+            // Reward = (int)Math.Round(5 * 1) = 5
+            Assert.That(reward, Is.EqualTo(5));
+        }
+
+        [Test]
+        public void OnTrainArrived_AddsCoinsToGameState()
+        {
+            economy.TryBuyLine(1);
+            int coinsBeforeArrival = gameState.Coins;
+
+            int reward = economy.OnTrainArrived(1);
+
+            Assert.That(gameState.Coins, Is.EqualTo(coinsBeforeArrival + reward));
+        }
+
+        [Test]
+        public void OnTrainArrived_UnknownIdThrows()
+        {
+            Assert.Throws<ArgumentException>(
+                () => economy.OnTrainArrived(-1)
+            );
+        }
+
+        [Test]
+        public void OnTrainArrived_WithCustomCoinRate()
+        {
+            var customEconomy = new Economy(gameState, network, coinRate: 2f);
+            
+            Line testLine = new Line(2, nodeA, nodeB, 50);
+            var networkWithLine = new Network(
+                new[] { nodeA, nodeB },
+                new[] { line, testLine }
+            );
+            customEconomy = new Economy(gameState, networkWithLine, coinRate: 2f);
+            customEconomy.TryBuyLine(2);
+
+            int reward = customEconomy.OnTrainArrived(2);
+
+            // Line length is 5, coin rate is 2
+            // Reward = (int)Math.Round(5 * 2) = 10
+            Assert.That(reward, Is.EqualTo(10));
+        }
     }
 }
