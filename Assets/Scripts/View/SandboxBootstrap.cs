@@ -1,5 +1,7 @@
-using UnityEngine;
 using ChugHaul.Core;
+using System.Collections.Generic;
+using UnityEngine;
+using static PlasticGui.Help.GuiHelp;
 
 namespace ChugHaul.View
 {
@@ -16,6 +18,7 @@ namespace ChugHaul.View
             var state = new GameState(startCoins);
             Network network = TestMap.Create();
             var economy = new Economy(state, network);
+            var views = new Dictionary<int, LineView>();
 
             foreach (var node in network.Nodes)
             {
@@ -30,14 +33,21 @@ namespace ChugHaul.View
                 go.name = $"Line_{line.Id}";
                 var view = go.GetComponent<LineView>();
                 view.Init(line);
-
-                // Temporary visible bar so hover and selected tints can be seen
-                var bar = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                Destroy(bar.GetComponent<Collider>());   // the line's own BoxCollider handles clicks
-                bar.transform.SetParent(go.transform, false);
-                bar.transform.localPosition = new Vector3(0f, 0.1f, 0f);
-                bar.transform.localScale = new Vector3(0.2f, 0.05f, line.Length - 2f);
+                views[line.Id] = view;
             }
+            economy.LineActivated += activatedLine =>
+            {
+                Debug.Log($"LineActivated event fired for line {activatedLine.Id}");
+                if (views.ContainsKey(activatedLine.Id))
+                {
+                    views[activatedLine.Id].OnActivated();
+                    Debug.Log($"OnActivated called for line {activatedLine.Id}");
+                }
+                else
+                {
+                    Debug.LogError($"Line {activatedLine.Id} not found in views dictionary!");
+                }
+            };
 
             selection.Init(economy);
         }

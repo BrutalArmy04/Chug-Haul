@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3977589680036083484}
   - component: {fileID: 7262664863497507017}
   - component: {fileID: 7026401913091012596}
+  - component: {fileID: 2999967887214478088}
   m_Layer: 3
   m_Name: LineClickable
   m_TagString: Untagged
@@ -69,3 +70,21 @@ MonoBehaviour:
   hoverColor: {r: 1, g: 0.95, b: 0.5, a: 1}
   selectedColor: {r: 0.5, g: 1, b: 0.6, a: 1}
   tintAmount: 0.45
+  track: {fileID: 0}
+--- !u!114 &2999967887214478088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8624082566854192154}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 55a97c6436643474794e9d9566217399, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ChugHaul.View::ChugHaul.View.TrackBuilder
+  trackPrefab: {fileID: 514724804688157737, guid: 39b4104306707854780736b76da9adaf, type: 3}
+  pieceLength: 0.8
+  pivotAtCenter: 0
+  endPadding: 1
+  ghostMaterial: {fileID: 5961886273506372552, guid: dc2c8e80d57bfae46bb4e7e0434e0af3, type: 3}
