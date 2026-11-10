@@ -13,7 +13,9 @@ namespace ChugHaul.View
         [SerializeField] Transform trainsParent; // empty "Trains" object in the scene
         [SerializeField] SelectionController selection;
         [SerializeField] int startCoins = 100;
-        [SerializeField] float endPadding = 1f; // LineView's padding
+        [SerializeField] float endPadding = 2f; // train's padding
+        [SerializeField] CoinHud hud;
+        GameState state;
 
         readonly Dictionary<int, LineView> views = new Dictionary<int, LineView>();
         Economy economy; // field so OnDestroy can see it
@@ -21,7 +23,7 @@ namespace ChugHaul.View
 
         void Start()
         {
-            var state = new GameState(startCoins);
+            state = new GameState(startCoins);
             Network network = TestMap.Create();
             economy = new Economy(state, network);
 
@@ -49,6 +51,9 @@ namespace ChugHaul.View
             economy.LineActivated += onLineActivated;
 
             selection.Init(economy);
+
+            hud.Init(state);
+            selection.PurchaseAttempted += hud.ShowPurchaseResult;
         }
 
         void SpawnTrain(Line line)
@@ -64,6 +69,7 @@ namespace ChugHaul.View
         void OnDestroy()
         {
             if (economy != null) economy.LineActivated -= onLineActivated;
+            if (selection != null) selection.PurchaseAttempted -= hud.ShowPurchaseResult;
         }
     }
 }

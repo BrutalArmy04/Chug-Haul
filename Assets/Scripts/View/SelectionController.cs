@@ -59,13 +59,13 @@ namespace ChugHaul.View
             if (target is LineView line && economy != null)
             {
                 BuyResult result = economy.TryBuyLine(line.Id);   // View asks, Core decides
-                Debug.Log($"Line {line.Id}: {result}");
+                // Debug.Log($"Line {line.Id}: {result}");
                 PurchaseAttempted?.Invoke(line.Id, result);
             }
-            else if (target is NodeView node)
-            {
-                Debug.Log($"Selected city {node.Id}");
-            }
+            //else if (target is NodeView node)
+            //{
+            //    Debug.Log($"Selected city {node.Id}");
+            //}
         }
     }
 }
