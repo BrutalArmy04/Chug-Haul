@@ -1,7 +1,6 @@
-using ChugHaul.Core;
 using System.Collections.Generic;
 using UnityEngine;
-using static PlasticGui.Help.GuiHelp;
+using ChugHaul.Core;
 
 namespace ChugHaul.View
 {
@@ -10,15 +9,21 @@ namespace ChugHaul.View
     {
         [SerializeField] GameObject cityPrefab;
         [SerializeField] GameObject lineClickablePrefab;
+        [SerializeField] GameObject trainPrefab;
+        [SerializeField] Transform trainsParent; // empty "Trains" object in the scene
         [SerializeField] SelectionController selection;
-        [SerializeField] int startCoins = 50;
+        [SerializeField] int startCoins = 100;
+        [SerializeField] float endPadding = 1f; // LineView's padding
+
+        readonly Dictionary<int, LineView> views = new Dictionary<int, LineView>();
+        Economy economy; // field so OnDestroy can see it
+        System.Action<Line> onLineActivated; // field so we can unsubscribe
 
         void Start()
         {
             var state = new GameState(startCoins);
             Network network = TestMap.Create();
-            var economy = new Economy(state, network);
-            var views = new Dictionary<int, LineView>();
+            economy = new Economy(state, network);
 
             foreach (var node in network.Nodes)
             {
@@ -35,21 +40,30 @@ namespace ChugHaul.View
                 view.Init(line);
                 views[line.Id] = view;
             }
-            economy.LineActivated += activatedLine =>
+
+            onLineActivated = activatedLine =>
             {
-                Debug.Log($"LineActivated event fired for line {activatedLine.Id}");
-                if (views.ContainsKey(activatedLine.Id))
-                {
-                    views[activatedLine.Id].OnActivated();
-                    Debug.Log($"OnActivated called for line {activatedLine.Id}");
-                }
-                else
-                {
-                    Debug.LogError($"Line {activatedLine.Id} not found in views dictionary!");
-                }
+                views[activatedLine.Id].OnActivated();
+                SpawnTrain(activatedLine);
             };
+            economy.LineActivated += onLineActivated;
 
             selection.Init(economy);
+        }
+
+        void SpawnTrain(Line line)
+        {
+            var a = new Vector3(line.NodeA.X, 0f, line.NodeA.Z);
+            var b = new Vector3(line.NodeB.X, 0f, line.NodeB.Z);
+            var go = Instantiate(trainPrefab, a, Quaternion.identity, trainsParent);
+            var train = go.GetComponent<TrainView>();
+            train.Init(line.Id, a, b, endPadding);
+            train.Arrived += id => economy.OnTrainArrived(id);
+        }
+
+        void OnDestroy()
+        {
+            if (economy != null) economy.LineActivated -= onLineActivated;
         }
     }
 }
