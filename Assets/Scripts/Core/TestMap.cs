@@ -9,14 +9,14 @@ namespace ChugHaul.Core
             Node sibiu = new Node(3, "Sibiu", 8, 7);
             Node cluj = new Node(4, "Cluj", 9, 0);
 
-            Line line1 = new Line(1, bucharest, brasov, 20);
-            Line line2 = new Line(2, brasov, sibiu, 15);
-            Line line3 = new Line(3, sibiu, cluj, 25);
-            Line line4 = new Line(4, bucharest, cluj, 40);
+            // 4 stops. Brasov is a middle stop here and the end of line 2, so the two lines share it
+            // (and Cluj). Costs are rough: line 1 is affordable with the scene's 50 starting coins.
+            Line line1 = new Line(1, new[] { bucharest, brasov, sibiu, cluj }, 45);
+            Line line2 = new Line(2, brasov, cluj, 30);
 
             return new Network(
                 new[] { bucharest, brasov, sibiu, cluj },
-                new[] { line1, line2, line3, line4 }
+                new[] { line1, line2 }
             );
         }
     }

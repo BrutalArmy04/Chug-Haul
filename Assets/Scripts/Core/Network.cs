@@ -48,14 +48,19 @@ namespace ChugHaul.Core
                 if (!linesById.TryAdd(line.Id, line))
                     throw new ArgumentException($"Duplicate line ID: {line.Id}");
 
-                if (ReferenceEquals(line.NodeA, line.NodeB))
-                    throw new ArgumentException("A line cannot connect a node to itself.");
+                // Line's constructor already guarantees these two; checked again so the
+                // Network never relies on how its lines were built.
+                if (line.Stops.Count < 2)
+                    throw new ArgumentException($"Line {line.Id} needs at least 2 stops.");
 
-                if (!nodesById.ContainsValue(line.NodeA) ||
-                    !nodesById.ContainsValue(line.NodeB))
+                if (line.Stops.Distinct().Count() != line.Stops.Count)
+                    throw new ArgumentException($"Line {line.Id} visits a stop more than once.");
+
+                foreach (Node stop in line.Stops)
                 {
-                    throw new ArgumentException(
-                        $"Line {line.Id} references a node outside the network.");
+                    if (!nodesById.ContainsValue(stop))
+                        throw new ArgumentException(
+                            $"Line {line.Id} references a node outside the network.");
                 }
             }
 
@@ -76,17 +81,15 @@ namespace ChugHaul.Core
             return line;
         }
 
+        // Every line that stops at this node, whether it's an end or a middle stop.
         public IReadOnlyList<Line> LinesAt(Node node)
         {
             List<Line> result = new List<Line>();
 
             foreach (Line line in lines)
             {
-                if (ReferenceEquals(line.NodeA, node) ||
-                    ReferenceEquals(line.NodeB, node))
-                {
+                if (line.IndexOf(node) >= 0)
                     result.Add(line);
-                }
             }
 
             return result.AsReadOnly();

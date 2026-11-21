@@ -86,16 +86,46 @@ namespace ChugHaul.Core.Tests
             );
         }
 
+        // Replaces M1's Constructor_SelfLoop_Throws: a line from a node to itself is now
+        // rejected by the Line constructor (see LineTests), before a Network ever sees it.
+
         [Test]
-        public void Constructor_SelfLoop_Throws()
+        public void Constructor_MiddleStopOutsideNetwork_Throws()
         {
             Node a = new Node(1, "A", 0, 0);
+            Node b = new Node(2, "B", 6, 0);
+            Node outside = new Node(3, "Outside", 3, 4);
 
-            Line line = new Line(1, a, a, 10);
+            Line line = new Line(1, new[] { a, outside, b }, 10);
 
             Assert.Throws<ArgumentException>(() =>
-                new Network(new[] { a }, new[] { line })
+                new Network(new[] { a, b }, new[] { line })
             );
+        }
+
+        [Test]
+        public void LinesAt_FindsLineWhereNodeIsAMiddleStop()
+        {
+            Node a = new Node(1, "A", 0, 0);
+            Node b = new Node(2, "B", 3, 0);
+            Node c = new Node(3, "C", 6, 0);
+            Node d = new Node(4, "D", 6, 4);
+
+            Line route = new Line(1, new[] { a, b, c }, 10);
+            Line branch = new Line(2, c, d, 10);
+            Network network = new Network(new[] { a, b, c, d }, new[] { route, branch });
+
+            Assert.That(network.LinesAt(b), Is.EquivalentTo(new[] { route }));
+            Assert.That(network.LinesAt(c), Is.EquivalentTo(new[] { route, branch }));
+        }
+
+        [Test]
+        public void TestMap_HasAFourStopLineAndASharedNode()
+        {
+            Network network = TestMap.Create();
+
+            Assert.That(network.Lines, Has.Some.Matches<Line>(l => l.Stops.Count >= 4));
+            Assert.That(network.Nodes, Has.Some.Matches<Node>(n => network.LinesAt(n).Count >= 2));
         }
     }
 }
