@@ -9,14 +9,18 @@ namespace ChugHaul.Core
             Node sibiu = new Node(3, "Sibiu", 8, 7);
             Node cluj = new Node(4, "Cluj", 9, 0);
 
-            Line line1 = new Line(1, bucharest, brasov, 20);
-            Line line2 = new Line(2, brasov, sibiu, 15);
-            Line line3 = new Line(3, sibiu, cluj, 25);
-            Line line4 = new Line(4, bucharest, cluj, 40);
+            Line line1 = new Line(1, new[] { bucharest, brasov }, 20);
+            Line line2 = new Line(2, new[] { brasov, sibiu }, 15);
+            Line line3 = new Line(3, new[] { sibiu, cluj }, 25);
+            Line line4 = new Line(4, new[] { bucharest, cluj }, 40);
+
+            // 4-stop line. Brasov and Sibiu are middle stops, and every node
+            // here is also shared with at least one of the lines above.
+            Line line5 = new Line(5, new[] { bucharest, brasov, sibiu, cluj }, 60);
 
             return new Network(
                 new[] { bucharest, brasov, sibiu, cluj },
-                new[] { line1, line2, line3, line4 }
+                new[] { line1, line2, line3, line4, line5 }
             );
         }
     }
