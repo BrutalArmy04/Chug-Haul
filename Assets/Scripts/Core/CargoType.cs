@@ -10,7 +10,12 @@ namespace ChugHaul.Core
         public int BaseValue { get; }
         public int WagonMass { get; }
 
-        public CargoType(int id, string name, int baseValue, int wagonMass)
+        /// <summary>
+        /// Passengers are paid at their destination and have no demand stock in cities.
+        /// </summary>
+        public bool IsPassengers { get; }
+
+        public CargoType(int id, string name, int baseValue, int wagonMass, bool isPassengers = false)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("A cargo type needs a name.", nameof(name));
@@ -23,6 +28,7 @@ namespace ChugHaul.Core
             Name = name;
             BaseValue = baseValue;
             WagonMass = wagonMass;
+            IsPassengers = isPassengers;
         }
     }
 }

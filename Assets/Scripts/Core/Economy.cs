@@ -24,6 +24,31 @@ namespace ChugHaul.Core
                 ?? throw new ArgumentNullException(nameof(network));
 
             this.config = config ?? new EconomyConfig();
+
+            Cargos = new CargoCatalog(this.config.Cargos);
+            Demand = new DemandSystem(this.network, this.config);
+            Depot = new DepotSystem(this.network, Cargos, this.config);
+        }
+
+        /// <summary>Every cargo kind in the game.</summary>
+        public CargoCatalog Cargos { get; }
+
+        /// <summary>What each node has in stock for trains to load.</summary>
+        public DepotSystem Depot { get; }
+
+        /// <summary>What a train could load at this node right now.</summary>
+        public IReadOnlyList<OfferItem> GetOffer(Node node)
+        {
+            return Depot.GetOffer(node);
+        }
+
+        /// <summary>What cities want and how much room they have left for it.</summary>
+        public DemandSystem Demand { get; }
+
+        /// <summary>Advances all time-based systems by dt seconds.</summary>
+        public void Tick(float dt)
+        {
+            Demand.Tick(dt);
         }
 
         public BuyResult TryBuyLine(int lineId)
@@ -79,7 +104,7 @@ namespace ChugHaul.Core
             if (!gameState.TrySpend(config.TrainPrice))
                 return BuyResult.NotEnoughCoins;
 
-            var train = new Train(line, config.TrainCapacity);
+            var train = new Train(line, config.TrainCapacity, config.LocomotiveMass);
             trains.Add(lineId, train);
 
             TrainBought?.Invoke(train);
@@ -89,7 +114,9 @@ namespace ChugHaul.Core
 
         /// <summary>
         /// Sends the line's train to a stop on its line, non-stop.
-        /// Checks run in order: NoTrain, NotAtStop, NotOnLine, SameStop.
+        /// Checks run in order: NoTrain, NotAtStop, NotOnLine, SameStop, OverCapacity, NotInStock.
+        /// The load is taken from the depot at the train's current stop. Everything is
+        /// checked before anything is taken, so a train is never left half-loaded.
         /// </summary>
         public DispatchResult TryDispatch(int lineId, Node destination, Cargo load = null)
         {
@@ -107,11 +134,27 @@ namespace ChugHaul.Core
             if (ReferenceEquals(destination, train.CurrentStop))
                 return DispatchResult.SameStop;
 
-            // Hand the load to the depot/loading code. Placeholder until that task lands.
-            train.Cargo = load ?? new Cargo();
+            Cargo wagons = load ?? Cargo.Empty;
 
+            if (wagons.Count > train.Capacity)
+                return DispatchResult.OverCapacity;
+
+            // One item per wagon; the depot sums repeats of the same cargo.
+            var items = new List<OfferItem>(wagons.Count);
+            foreach (CargoType wagon in wagons)
+                items.Add(new OfferItem(wagon, 1));
+
+            if (items.Count > 0 && !Depot.CanTake(train.CurrentStop, items))
+                return DispatchResult.NotInStock;
+
+            // Everything is checked. Update the train first, then take from the depot,
+            // so DepotChanged listeners see a consistent state.
+            train.Cargo = wagons;
             train.Destination = destination;
             train.State = TrainState.Travelling;
+
+            if (items.Count > 0)
+                Depot.TryTakeMany(train.CurrentStop, items);
 
             TrainDeparted?.Invoke(train);
 

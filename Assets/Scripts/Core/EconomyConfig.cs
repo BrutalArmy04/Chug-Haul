@@ -20,7 +20,7 @@ namespace ChugHaul.Core
         public CargoType[] Cargos =
         {
             // Basic goods
-            new CargoType(1, "Passengers", 5, 1),
+            new CargoType(1, "Passengers", 5, 1, isPassengers: true),
             new CargoType(2, "Mail", 8, 1),
             new CargoType(3, "Food", 10, 2),
             // Raw goods

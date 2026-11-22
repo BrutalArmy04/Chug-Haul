@@ -6,6 +6,8 @@ namespace ChugHaul.Core
         NoTrain,
         NotAtStop,
         NotOnLine,
-        SameStop
+        SameStop,
+        OverCapacity,
+        NotInStock
     }
 }

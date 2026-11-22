@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using ChugHaul.Core;
 using System;
+using System.Collections.Generic;
 
 namespace ChugHaul.Core.Tests
 {
@@ -326,6 +327,238 @@ namespace ChugHaul.Core.Tests
             economy.TryBuyLine(1);
 
             Assert.Throws<InvalidOperationException>(() => economy.CompleteTrip(1));
+        }
+
+        // ---------- Loading ----------
+
+        private CargoType Kind(string name) => economy.Cargos.GetByName(name);
+
+        private static Cargo Load(params CargoType[] wagons) => new Cargo(wagons);
+
+        private void Stock(Node node, CargoType cargo, int amount)
+        {
+            for (int i = 0; i < amount; i++)
+                Assert.That(economy.Depot.Add(node, cargo), Is.True);
+        }
+
+        [Test]
+        public void GetOffer_ShowsWhatTheNodesDepotHolds()
+        {
+            CargoType food = Kind("Food");
+            Stock(nodeA, food, 3);
+
+            var offer = economy.GetOffer(nodeA);
+
+            Assert.That(offer.Count, Is.EqualTo(1));
+            Assert.That(offer[0].Cargo, Is.SameAs(food));
+            Assert.That(offer[0].Count, Is.EqualTo(3));
+            Assert.That(economy.GetOffer(nodeB), Is.Empty);
+        }
+
+        [Test]
+        public void TryDispatch_OverCapacity_TakesNothing()
+        {
+            BuyLineAndTrain();
+            CargoType food = Kind("Food");
+            Stock(nodeA, food, 5);
+            Assert.That(config.TrainCapacity, Is.EqualTo(4));
+
+            DispatchResult result = economy.TryDispatch(
+                1, nodeB, Load(food, food, food, food, food));
+
+            Assert.That(result, Is.EqualTo(DispatchResult.OverCapacity));
+            Assert.That(economy.Depot.Count(nodeA, food), Is.EqualTo(5));
+            Assert.That(economy.GetTrain(1).State, Is.EqualTo(TrainState.AtStop));
+            Assert.That(economy.GetTrain(1).Cargo.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void TryDispatch_NotInStock_TakesNothing()
+        {
+            BuyLineAndTrain();
+            CargoType food = Kind("Food");
+            Stock(nodeA, food, 3);
+
+            DispatchResult result = economy.TryDispatch(1, nodeB, Load(food, food, food, food));
+
+            Assert.That(result, Is.EqualTo(DispatchResult.NotInStock));
+            Assert.That(economy.Depot.Count(nodeA, food), Is.EqualTo(3));
+            Assert.That(economy.GetTrain(1).State, Is.EqualTo(TrainState.AtStop));
+            Assert.That(economy.GetTrain(1).Cargo.Count, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void TryDispatch_OverCapacityIsCheckedBeforeStock()
+        {
+            BuyLineAndTrain();
+            CargoType food = Kind("Food");
+            Stock(nodeA, food, 3); // short on stock AND over capacity
+
+            DispatchResult result = economy.TryDispatch(
+                1, nodeB, Load(food, food, food, food, food));
+
+            Assert.That(result, Is.EqualTo(DispatchResult.OverCapacity));
+        }
+
+        [Test]
+        public void TryDispatch_MixedLoadMissingOneCargo_TakesNothing()
+        {
+            BuyLineAndTrain();
+            CargoType food = Kind("Food");
+            CargoType steel = Kind("Steel");
+            Stock(nodeA, food, 2); // no steel
+
+            DispatchResult result = economy.TryDispatch(1, nodeB, Load(food, steel));
+
+            Assert.That(result, Is.EqualTo(DispatchResult.NotInStock));
+            Assert.That(economy.Depot.Count(nodeA, food), Is.EqualTo(2));
+        }
+
+        [Test]
+        public void TryDispatch_LoadsOnlyFromTheTrainsCurrentStop()
+        {
+            BuyLineAndTrain();
+            CargoType food = Kind("Food");
+            Stock(nodeB, food, 3); // train is at A
+
+            DispatchResult result = economy.TryDispatch(1, nodeB, Load(food));
+
+            Assert.That(result, Is.EqualTo(DispatchResult.NotInStock));
+            Assert.That(economy.Depot.Count(nodeB, food), Is.EqualTo(3));
+        }
+
+        [Test]
+        public void TryDispatch_FailedLoad_DoesNotRaiseDeparted()
+        {
+            BuyLineAndTrain();
+            int departed = 0;
+            economy.TrainDeparted += t => departed++;
+
+            economy.TryDispatch(1, nodeB, Load(Kind("Food")));
+
+            Assert.That(departed, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void TryDispatch_ValidLoad_ReducesDepotSetsCargoAndFiresDepotChanged()
+        {
+            BuyLineAndTrain();
+            CargoType food = Kind("Food");
+            Stock(nodeA, food, 3);
+
+            var seen = new List<(CargoType cargo, int count, TrainState state, int cargoCount)>();
+            economy.Depot.DepotChanged += (n, c, count) =>
+            {
+                Train t = economy.GetTrain(1);
+                seen.Add((c, count, t.State, t.Cargo.Count));
+            };
+
+            DispatchResult result = economy.TryDispatch(1, nodeB, Load(food, food));
+
+            Assert.That(result, Is.EqualTo(DispatchResult.Ok));
+            Assert.That(economy.Depot.Count(nodeA, food), Is.EqualTo(1));
+            Assert.That(economy.GetTrain(1).Cargo.Count, Is.EqualTo(2));
+            Assert.That(economy.GetTrain(1).Cargo[0], Is.SameAs(food));
+            Assert.That(seen.Count, Is.EqualTo(1));
+            Assert.That(seen[0].cargo, Is.SameAs(food));
+            Assert.That(seen[0].count, Is.EqualTo(1));
+            // The train was already updated when the event fired.
+            Assert.That(seen[0].state, Is.EqualTo(TrainState.Travelling));
+            Assert.That(seen[0].cargoCount, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void TryDispatch_MixedLoad_FiresOneEventPerCargoType()
+        {
+            BuyLineAndTrain();
+            CargoType food = Kind("Food");
+            CargoType steel = Kind("Steel");
+            Stock(nodeA, food, 3);
+            Stock(nodeA, steel, 1);
+
+            var seen = new List<(CargoType, int)>();
+            economy.Depot.DepotChanged += (n, c, count) => seen.Add((c, count));
+
+            economy.TryDispatch(1, nodeB, Load(food, steel, food));
+
+            Assert.That(seen.Count, Is.EqualTo(2));
+            Assert.That(seen[0].Item1, Is.SameAs(food));
+            Assert.That(seen[0].Item2, Is.EqualTo(1));
+            Assert.That(seen[1].Item1, Is.SameAs(steel));
+            Assert.That(seen[1].Item2, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void TryDispatch_EmptyLoad_StillWorks()
+        {
+            BuyLineAndTrain();
+
+            Assert.That(economy.TryDispatch(1, nodeB, new Cargo()), Is.EqualTo(DispatchResult.Ok));
+            Assert.That(economy.GetTrain(1).Cargo.Count, Is.EqualTo(0));
+        }
+
+        // ---------- Mass ----------
+
+        private int MassOnTrip(Node from, Node to, params CargoType[] wagons)
+        {
+            foreach (CargoType wagon in wagons)
+                Stock(from, wagon, 1);
+
+            Assert.That(economy.TryDispatch(1, to, Load(wagons)), Is.EqualTo(DispatchResult.Ok));
+            int mass = economy.GetTrain(1).TotalMass;
+            economy.CompleteTrip(1);
+            return mass;
+        }
+
+        [Test]
+        public void TotalMass_EmptyTrain_IsLocomotiveMass()
+        {
+            BuyLineAndTrain();
+
+            Assert.That(economy.GetTrain(1).TotalMass, Is.EqualTo(config.LocomotiveMass));
+        }
+
+        [Test]
+        public void TotalMass_GrowsWithEachWagon()
+        {
+            BuyLineAndTrain();
+            CargoType food = Kind("Food");
+
+            int one = MassOnTrip(nodeA, nodeB, food);
+            int two = MassOnTrip(nodeB, nodeA, food, food);
+            int three = MassOnTrip(nodeA, nodeB, food, food, food);
+
+            Assert.That(one, Is.EqualTo(config.LocomotiveMass + food.WagonMass));
+            Assert.That(two, Is.EqualTo(config.LocomotiveMass + 2 * food.WagonMass));
+            Assert.That(three, Is.EqualTo(config.LocomotiveMass + 3 * food.WagonMass));
+            Assert.That(one, Is.LessThan(two));
+            Assert.That(two, Is.LessThan(three));
+        }
+
+        [Test]
+        public void TotalMass_DependsOnTheCargo()
+        {
+            BuyLineAndTrain();
+            CargoType food = Kind("Food");
+            CargoType steel = Kind("Steel");
+            Assert.That(steel.WagonMass, Is.Not.EqualTo(food.WagonMass));
+
+            int foodMass = MassOnTrip(nodeA, nodeB, food, food);
+            int steelMass = MassOnTrip(nodeB, nodeA, steel, steel);
+
+            Assert.That(foodMass, Is.EqualTo(config.LocomotiveMass + 2 * food.WagonMass));
+            Assert.That(steelMass, Is.EqualTo(config.LocomotiveMass + 2 * steel.WagonMass));
+        }
+
+        [Test]
+        public void TotalMass_FollowsTheConfiguredLocomotiveMass()
+        {
+            var custom = new EconomyConfig { LocomotiveMass = 20 };
+            var eco = new Economy(new GameState(200), network, custom);
+            eco.TryBuyLine(1);
+            eco.TryBuyTrain(1);
+
+            Assert.That(eco.GetTrain(1).TotalMass, Is.EqualTo(20));
         }
 
         // ---------- Config ----------

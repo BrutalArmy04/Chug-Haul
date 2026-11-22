@@ -2,6 +2,8 @@ namespace ChugHaul.Core
 {
     public class Train
     {
+        private readonly int locomotiveMass;
+
         public Line Line { get; }
 
         /// <summary>Where the train is, or last was. Updated on arrival.</summary>
@@ -16,10 +18,23 @@ namespace ChugHaul.Core
 
         public int Capacity { get; }
 
-        internal Train(Line line, int capacity)
+        /// <summary>Locomotive mass plus the mass of every wagon currently loaded.</summary>
+        public int TotalMass
+        {
+            get
+            {
+                int mass = locomotiveMass;
+                foreach (CargoType wagon in Cargo)
+                    mass += wagon.WagonMass;
+                return mass;
+            }
+        }
+
+        internal Train(Line line, int capacity, int locomotiveMass)
         {
             Line = line;
             Capacity = capacity;
+            this.locomotiveMass = locomotiveMass;
             CurrentStop = line.Stops[0];
             Destination = null;
             State = TrainState.AtStop;
