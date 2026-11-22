@@ -7,7 +7,7 @@ namespace ChugHaul.Core
     {
         private readonly GameState gameState;
         private readonly Network network;
-        private readonly float coinRate;
+        private readonly EconomyConfig config;
         private readonly Dictionary<int, Train> trains = new Dictionary<int, Train>();
 
         public event Action<Line> LineActivated;
@@ -15,7 +15,7 @@ namespace ChugHaul.Core
         public event Action<Train> TrainDeparted;
         public event Action<Train> TrainArrived;
 
-        public Economy(GameState gameState, Network network, float coinRate = EconomyConfig.CoinRate)
+        public Economy(GameState gameState, Network network, EconomyConfig config = null)
         {
             this.gameState = gameState
                 ?? throw new ArgumentNullException(nameof(gameState));
@@ -23,7 +23,7 @@ namespace ChugHaul.Core
             this.network = network
                 ?? throw new ArgumentNullException(nameof(network));
 
-            this.coinRate = coinRate;
+            this.config = config ?? new EconomyConfig();
         }
 
         public BuyResult TryBuyLine(int lineId)
@@ -39,11 +39,13 @@ namespace ChugHaul.Core
             if (line.IsActive)
                 return BuyResult.AlreadyActive;
 
-            if (gameState.Coins < line.Cost)
+            int price = (int)Math.Round(line.Cost * config.LinePriceFactor);
+
+            if (gameState.Coins < price)
                 return BuyResult.NotEnoughCoins;
 
             // All checks have passed. Now perform the purchase.
-            bool spent = gameState.TrySpend(line.Cost);
+            bool spent = gameState.TrySpend(price);
 
             if (!spent)
                 return BuyResult.NotEnoughCoins;
@@ -74,10 +76,10 @@ namespace ChugHaul.Core
                 return BuyResult.AlreadyHasTrain;
 
             // Strict spending for now; the debt task changes this later.
-            if (!gameState.TrySpend(EconomyConfig.TrainPrice))
+            if (!gameState.TrySpend(config.TrainPrice))
                 return BuyResult.NotEnoughCoins;
 
-            var train = new Train(line, EconomyConfig.TrainCapacity);
+            var train = new Train(line, config.TrainCapacity);
             trains.Add(lineId, train);
 
             TrainBought?.Invoke(train);
@@ -149,7 +151,7 @@ namespace ChugHaul.Core
             if (line == null) throw new ArgumentException($"Unknown line {lineId}");  // adjust if GetLine throws itself
             if (!line.IsActive) return 0;
 
-            int reward = (int)Math.Round(line.Length * coinRate);
+            int reward = (int)Math.Round(line.Length * config.LegacyCoinRate);
             gameState.Earn(reward);
             return reward;
         }

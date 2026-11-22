@@ -12,6 +12,7 @@ namespace ChugHaul.Core.Tests
         private Line line;
         private Network network;
         private Economy economy;
+        private EconomyConfig config;
 
         [SetUp]
         public void SetUp()
@@ -28,7 +29,8 @@ namespace ChugHaul.Core.Tests
                 new[] { line }
             );
 
-            economy = new Economy(gameState, network);
+            config = new EconomyConfig();
+            economy = new Economy(gameState, network, config);
         }
 
         // ---------- Lines ----------
@@ -135,13 +137,13 @@ namespace ChugHaul.Core.Tests
 
             Train train = economy.GetTrain(1);
             Assert.That(result, Is.EqualTo(BuyResult.Ok));
-            Assert.That(gameState.Coins, Is.EqualTo(50 - EconomyConfig.TrainPrice));
+            Assert.That(gameState.Coins, Is.EqualTo(50 - config.TrainPrice));
             Assert.That(train, Is.Not.Null);
             Assert.That(train.Line, Is.SameAs(line));
             Assert.That(train.State, Is.EqualTo(TrainState.AtStop));
             Assert.That(train.CurrentStop, Is.SameAs(nodeA));
             Assert.That(train.Destination, Is.Null);
-            Assert.That(train.Capacity, Is.EqualTo(EconomyConfig.TrainCapacity));
+            Assert.That(train.Capacity, Is.EqualTo(config.TrainCapacity));
             Assert.That(train.Cargo, Is.Not.Null);
         }
 
@@ -326,6 +328,65 @@ namespace ChugHaul.Core.Tests
             Assert.Throws<InvalidOperationException>(() => economy.CompleteTrip(1));
         }
 
+        // ---------- Config ----------
+
+        [Test]
+        public void Config_Defaults_PriceTableHasOneEntryPerFreeSlotCount()
+        {
+            var defaults = new EconomyConfig();
+
+            Assert.That(defaults.PriceBySlots.Length, Is.EqualTo(defaults.DemandSlots + 1));
+        }
+
+        [Test]
+        public void CustomConfig_TrainCapacityIsRespected()
+        {
+            var custom = new EconomyConfig { TrainCapacity = 2 };
+            var eco = new Economy(new GameState(100), network, custom);
+            eco.TryBuyLine(1);
+
+            eco.TryBuyTrain(1);
+
+            Assert.That(eco.GetTrain(1).Capacity, Is.EqualTo(2));
+        }
+
+        [Test]
+        public void CustomConfig_TrainPriceIsCharged()
+        {
+            var state = new GameState(100);
+            var eco = new Economy(state, network, new EconomyConfig { TrainPrice = 10 });
+            eco.TryBuyLine(1);
+
+            eco.TryBuyTrain(1);
+
+            Assert.That(state.Coins, Is.EqualTo(100 - 50 - 10));
+        }
+
+        [Test]
+        public void CustomConfig_LinePriceFactorScalesLineCost()
+        {
+            var state = new GameState(100);
+            var eco = new Economy(state, network, new EconomyConfig { LinePriceFactor = 0.5f });
+
+            eco.TryBuyLine(1);
+
+            // Line cost 50 x 0.5 = 25
+            Assert.That(state.Coins, Is.EqualTo(75));
+        }
+
+        [Test]
+        public void CustomConfig_LinePriceFactorCanMakeLineUnaffordable()
+        {
+            var state = new GameState(100);
+            var eco = new Economy(state, network, new EconomyConfig { LinePriceFactor = 3f });
+
+            BuyResult result = eco.TryBuyLine(1);
+
+            // 50 x 3 = 150 > 100
+            Assert.That(result, Is.EqualTo(BuyResult.NotEnoughCoins));
+            Assert.That(line.IsActive, Is.False);
+        }
+
         // ---------- Old payout (removed with the payout task) ----------
 
         [Test]
@@ -375,7 +436,8 @@ namespace ChugHaul.Core.Tests
                 new[] { nodeA, nodeB },
                 new[] { line, testLine }
             );
-            var customEconomy = new Economy(gameState, networkWithLine, coinRate: 2f);
+            var customEconomy = new Economy(
+                gameState, networkWithLine, new EconomyConfig { LegacyCoinRate = 2f });
             customEconomy.TryBuyLine(2);
 
             int reward = customEconomy.OnTrainArrived(2);
