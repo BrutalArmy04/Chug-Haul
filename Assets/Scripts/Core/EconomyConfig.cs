@@ -16,7 +16,21 @@ namespace ChugHaul.Core
         public float LinePriceFactor = 1f;
 
         // ---- Cargo / trains ----
-        // Per-cargo base value and wagon mass arrive with the cargo task.
+        /// <summary>Every cargo kind: id, name, base value, wagon mass. First guesses.</summary>
+        public CargoType[] Cargos =
+        {
+            // Basic goods
+            new CargoType(1, "Passengers", 5, 1),
+            new CargoType(2, "Mail", 8, 1),
+            new CargoType(3, "Food", 10, 2),
+            // Raw goods
+            new CargoType(4, "Wood", 6, 3),
+            new CargoType(5, "Iron ore", 7, 4),
+            // Processed goods
+            new CargoType(6, "Planks", 12, 3),
+            new CargoType(7, "Steel", 15, 4),
+        };
+
         public int LocomotiveMass = 5;
         public int TrainCapacity = 4;
 

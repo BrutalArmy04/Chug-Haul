@@ -1,18 +1,65 @@
+using System;
+using System.Collections.Generic;
+
 namespace ChugHaul.Core
 {
     public class Node
     {
+        private static readonly CargoType[] NoCargo = new CargoType[0];
+
         public int Id { get; }
         public string Name { get; }
         public float X { get; }
         public float Z { get; }
 
-        public Node(int id, string name, float x, float z)
+        /// <summary>Cargo this node supplies.</summary>
+        public IReadOnlyList<CargoType> Produces { get; }
+
+        /// <summary>Cargo this node wants. Never overlaps Produces.</summary>
+        public IReadOnlyList<CargoType> Demands { get; }
+
+        public Node(
+            int id,
+            string name,
+            float x,
+            float z,
+            IEnumerable<CargoType> produces = null,
+            IEnumerable<CargoType> demands = null)
         {
             Id = id;
             Name = name;
             X = x;
             Z = z;
+
+            CargoType[] produced = produces == null ? NoCargo : new List<CargoType>(produces).ToArray();
+            CargoType[] demanded = demands == null ? NoCargo : new List<CargoType>(demands).ToArray();
+
+            var producedIds = new HashSet<int>();
+            foreach (CargoType cargo in produced)
+            {
+                if (cargo == null)
+                    throw new ArgumentException("Produces cannot contain null.", nameof(produces));
+                if (!producedIds.Add(cargo.Id))
+                    throw new ArgumentException(
+                        $"Node {id} lists cargo {cargo.Id} twice in Produces.", nameof(produces));
+            }
+
+            var demandedIds = new HashSet<int>();
+            foreach (CargoType cargo in demanded)
+            {
+                if (cargo == null)
+                    throw new ArgumentException("Demands cannot contain null.", nameof(demands));
+                if (!demandedIds.Add(cargo.Id))
+                    throw new ArgumentException(
+                        $"Node {id} lists cargo {cargo.Id} twice in Demands.", nameof(demands));
+                if (producedIds.Contains(cargo.Id))
+                    throw new ArgumentException(
+                        $"Node {id} cannot demand cargo {cargo.Id} because it produces it.",
+                        nameof(demands));
+            }
+
+            Produces = produced;
+            Demands = demanded;
         }
     }
 }
