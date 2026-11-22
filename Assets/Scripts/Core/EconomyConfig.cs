@@ -65,9 +65,5 @@ namespace ChugHaul.Core
         public float MinSpeedFactor = 0.3f;
         public float GradientCostFactor = 0.5f;
         public float WaterCostFactor = 2f;
-
-        // ---- Legacy (removed with the payout task) ----
-        /// <summary>Reward per unit of line length in the old Length x rate payout.</summary>
-        public float LegacyCoinRate = 1f;
     }
 }

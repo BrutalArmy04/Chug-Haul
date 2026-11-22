@@ -48,6 +48,10 @@ namespace ChugHaul.Core
                 throw new ArgumentException("DemandSlots cannot be negative.", nameof(config));
             if (config.CityConsumeInterval <= 0f)
                 throw new ArgumentException("CityConsumeInterval must be positive.", nameof(config));
+            if (config.PriceBySlots == null || config.PriceBySlots.Length != config.DemandSlots + 1)
+                throw new ArgumentException(
+                    "PriceBySlots needs DemandSlots + 1 entries (index = free slots).",
+                    nameof(config));
 
             foreach (Node node in network.Nodes)
             {
@@ -60,6 +64,12 @@ namespace ChugHaul.Core
                     stocks.Add(stock);
                 }
             }
+        }
+
+        /// <summary>True if the node has a demand stock for this cargo (never for passengers).</summary>
+        public bool Wants(Node node, CargoType cargo)
+        {
+            return FindStock(node, cargo) != null;
         }
 
         /// <summary>

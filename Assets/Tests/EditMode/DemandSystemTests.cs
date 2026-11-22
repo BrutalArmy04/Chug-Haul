@@ -252,7 +252,12 @@ namespace ChugHaul.Core.Tests
         [Test]
         public void CustomConfig_SlotsAndIntervalAreRespected()
         {
-            var custom = new EconomyConfig { DemandSlots = 2, CityConsumeInterval = 10f };
+            var custom = new EconomyConfig
+            {
+                DemandSlots = 2,
+                CityConsumeInterval = 10f,
+                PriceBySlots = new[] { 0f, 0.5f, 1.5f } // one entry per free-slot count: 0, 1, 2
+            };
             var system = new DemandSystem(network, custom);
 
             Assert.That(system.TryAccept(city, food), Is.EqualTo(2));
@@ -278,6 +283,26 @@ namespace ChugHaul.Core.Tests
 
             Assert.That(catalog.GetByName("Passengers").IsPassengers, Is.True);
             Assert.That(catalog.GetByName("Food").IsPassengers, Is.False);
+        }
+
+        // ---------- Wants ----------
+
+        [Test]
+        public void Wants_IsTrueOnlyForCargoWithAStock()
+        {
+            Assert.That(demand.Wants(city, food), Is.True);
+            Assert.That(demand.Wants(city, passengers), Is.False); // passengers have no stock
+            Assert.That(demand.Wants(city, mail), Is.False);       // the city produces it
+            Assert.That(demand.Wants(null, food), Is.False);
+        }
+
+        [Test]
+        public void PriceTableWithWrongLength_Throws()
+        {
+            // Default table has 6 entries, which only fits 5 demand slots.
+            var bad = new EconomyConfig { DemandSlots = 3 };
+
+            Assert.Throws<ArgumentException>(() => new DemandSystem(network, bad));
         }
 
         // ---------- Economy.Tick ----------

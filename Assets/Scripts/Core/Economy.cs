@@ -13,7 +13,7 @@ namespace ChugHaul.Core
         public event Action<Line> LineActivated;
         public event Action<Train> TrainBought;
         public event Action<Train> TrainDeparted;
-        public event Action<Train> TrainArrived;
+        public event Action<Train, DeliveryResult> TrainArrived;
 
         public Economy(GameState gameState, Network network, EconomyConfig config = null)
         {
@@ -165,7 +165,7 @@ namespace ChugHaul.Core
         /// Called by the View when the train reaches its destination.
         /// Throws if the line has no train or it is not Travelling (a View bug).
         /// </summary>
-        public void CompleteTrip(int lineId)
+        public DeliveryResult CompleteTrip(int lineId)
         {
             RequireLine(lineId);
 
@@ -176,27 +176,124 @@ namespace ChugHaul.Core
                 throw new InvalidOperationException(
                     $"Train on line {lineId} is not travelling.");
 
-            // Unload everything. The payout task turns this into money.
-            train.Cargo = new Cargo();
+            Node destination = train.Destination;
+            DeliveryResult result = ComputeDelivery(train, destination, train.Cargo);
 
-            train.CurrentStop = train.Destination;
+            // Move the train first, so every listener below sees it at its destination.
+            train.Cargo = Cargo.Empty;
+            train.CurrentStop = destination;
             train.Destination = null;
             train.State = TrainState.AtStop;
 
-            TrainArrived?.Invoke(train);
+            ApplyDelivery(destination, result);
+
+            if (result.Total > 0)
+                gameState.Earn(result.Total);
+
+            TrainArrived?.Invoke(train, result);
+
+            return result;
         }
 
-        // Called by the View when a train reaches the end of a line. Returns the coins earned.
-        // Remove together with the Length x coinRate reward once the payout task is merged.
-        public int OnTrainArrived(int lineId)
+        /// <summary>
+        /// What delivering this load at this destination would earn, without changing anything.
+        /// Returns exactly what CompleteTrip would produce for the same state.
+        /// </summary>
+        public DeliveryResult PreviewDelivery(Train train, Node destination, Cargo load)
         {
-            Line line = network.GetLine(lineId);
-            if (line == null) throw new ArgumentException($"Unknown line {lineId}");  // adjust if GetLine throws itself
-            if (!line.IsActive) return 0;
+            if (train == null) throw new ArgumentNullException(nameof(train));
+            if (destination == null) throw new ArgumentNullException(nameof(destination));
 
-            int reward = (int)Math.Round(line.Length * config.LegacyCoinRate);
-            gameState.Earn(reward);
-            return reward;
+            return ComputeDelivery(train, destination, load ?? Cargo.Empty);
+        }
+
+        /// <summary>
+        /// The single place that decides every wagon's outcome. Pure: it reads demand and
+        /// depot state, tracks the effect of earlier wagons in local counters, and changes
+        /// nothing. Both CompleteTrip and PreviewDelivery use it.
+        /// </summary>
+        private DeliveryResult ComputeDelivery(Train train, Node destination, Cargo load)
+        {
+            var wagons = new List<WagonDelivery>(load.Count);
+            var accepted = new Dictionary<int, int>(); // cargo id -> wagons sold so far
+            var stored = new Dictionary<int, int>();   // cargo id -> wagons stored so far
+
+            foreach (CargoType cargo in load)
+            {
+                if (cargo.IsPassengers)
+                {
+                    // The passengers task fills this in (paid only at their own destination).
+                    wagons.Add(new WagonDelivery(cargo, 0, WagonOutcome.Lost, 0));
+                    continue;
+                }
+
+                accepted.TryGetValue(cargo.Id, out int soldSoFar);
+                stored.TryGetValue(cargo.Id, out int storedSoFar);
+
+                if (Demand.Wants(destination, cargo))
+                {
+                    int free = Demand.FreeSlots(destination, cargo) - soldSoFar;
+                    if (free > 0)
+                    {
+                        float price = ApplyMultipliers(
+                            cargo.BaseValue * config.PriceBySlots[free],
+                            train, destination, cargo);
+
+                        wagons.Add(new WagonDelivery(
+                            cargo, (int)Math.Round(price), WagonOutcome.Sold, free));
+                        accepted[cargo.Id] = soldSoFar + 1;
+                        continue;
+                    }
+                }
+
+                // Not wanted, or no free slots: unpaid. Depot if there is room, else lost.
+                if (Depot.Count(destination, cargo) + storedSoFar < config.DepotCapacity)
+                {
+                    wagons.Add(new WagonDelivery(cargo, 0, WagonOutcome.StoredInDepot, 0));
+                    stored[cargo.Id] = storedSoFar + 1;
+                }
+                else
+                {
+                    wagons.Add(new WagonDelivery(cargo, 0, WagonOutcome.Lost, 0));
+                }
+            }
+
+            return new DeliveryResult(wagons);
+        }
+
+        /// <summary>
+        /// The one place to add price multipliers (variety bonus, first-delivery bonus, ...).
+        /// Must stay pure: it is also called by PreviewDelivery. Returns the price unchanged for now.
+        /// </summary>
+        private float ApplyMultipliers(float price, Train train, Node destination, CargoType cargo)
+        {
+            return price;
+        }
+
+        /// <summary>Makes a computed delivery real: fills demand slots and depots.</summary>
+        private void ApplyDelivery(Node destination, DeliveryResult result)
+        {
+            foreach (WagonDelivery wagon in result.Wagons)
+            {
+                switch (wagon.Outcome)
+                {
+                    case WagonOutcome.Sold:
+                    {
+                        int freeBefore = Demand.TryAccept(destination, wagon.Cargo);
+                        if (freeBefore != wagon.FreeSlotsBefore)
+                            throw new InvalidOperationException(
+                                "Delivery computation and demand state disagree.");
+                        break;
+                    }
+                    case WagonOutcome.StoredInDepot:
+                    {
+                        if (!Depot.Add(destination, wagon.Cargo))
+                            throw new InvalidOperationException(
+                                "Delivery computation and depot state disagree.");
+                        break;
+                    }
+                }
+            }
         }
 
         private Line RequireLine(int lineId)
