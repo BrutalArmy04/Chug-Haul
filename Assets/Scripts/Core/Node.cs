@@ -12,6 +12,8 @@ namespace ChugHaul.Core
         public float X { get; }
         public float Z { get; }
 
+        public NodeKind Kind { get; }
+
         /// <summary>Cargo this node supplies.</summary>
         public IReadOnlyList<CargoType> Produces { get; }
 
@@ -24,12 +26,14 @@ namespace ChugHaul.Core
             float x,
             float z,
             IEnumerable<CargoType> produces = null,
-            IEnumerable<CargoType> demands = null)
+            IEnumerable<CargoType> demands = null,
+            NodeKind kind = NodeKind.City)
         {
             Id = id;
             Name = name;
             X = x;
             Z = z;
+            Kind = kind;
 
             CargoType[] produced = produces == null ? NoCargo : new List<CargoType>(produces).ToArray();
             CargoType[] demanded = demands == null ? NoCargo : new List<CargoType>(demands).ToArray();
@@ -56,6 +60,16 @@ namespace ChugHaul.Core
                     throw new ArgumentException(
                         $"Node {id} cannot demand cargo {cargo.Id} because it produces it.",
                         nameof(demands));
+            }
+
+            if (kind == NodeKind.Industry)
+            {
+                if (produced.Length != 1)
+                    throw new ArgumentException(
+                        $"Industry {id} must produce exactly one cargo.", nameof(produces));
+                if (demanded.Length != 0)
+                    throw new ArgumentException(
+                        $"Industry {id} cannot demand anything.", nameof(demands));
             }
 
             Produces = produced;
