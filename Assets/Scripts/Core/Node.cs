@@ -14,6 +14,9 @@ namespace ChugHaul.Core
 
         public NodeKind Kind { get; }
 
+        /// <summary>The city's factory, or null. A city has 0 or 1.</summary>
+        public Factory Factory { get; }
+
         /// <summary>Cargo this node supplies.</summary>
         public IReadOnlyList<CargoType> Produces { get; }
 
@@ -27,7 +30,8 @@ namespace ChugHaul.Core
             float z,
             IEnumerable<CargoType> produces = null,
             IEnumerable<CargoType> demands = null,
-            NodeKind kind = NodeKind.City)
+            NodeKind kind = NodeKind.City,
+            Factory factory = null)
         {
             Id = id;
             Name = name;
@@ -72,8 +76,23 @@ namespace ChugHaul.Core
                         $"Industry {id} cannot demand anything.", nameof(demands));
             }
 
+            if (factory != null)
+            {
+                if (kind != NodeKind.City)
+                    throw new ArgumentException(
+                        $"Node {id}: only a city can have a factory.", nameof(factory));
+                if (!demandedIds.Contains(factory.Input.Id))
+                    throw new ArgumentException(
+                        $"Node {id}: the factory input must be listed in Demands.", nameof(factory));
+                if (demandedIds.Contains(factory.Output.Id))
+                    throw new ArgumentException(
+                        $"Node {id} cannot demand cargo {factory.Output.Id} because its factory makes it.",
+                        nameof(factory));
+            }
+
             Produces = produced;
             Demands = demanded;
+            Factory = factory;
         }
     }
 }

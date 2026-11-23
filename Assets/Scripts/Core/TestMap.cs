@@ -12,15 +12,20 @@ namespace ChugHaul.Core
             CargoType ironOre = cargo.GetByName("Iron ore");
             CargoType steel = cargo.GetByName("Steel");
 
-            // Cities: they make nothing for now, and each wants a different set of goods.
+            // Cities: they make nothing themselves (a factory's output goes straight into the depot),
+            // and each wants a different set of goods.
             Node bucharest = new Node(1, "Bucharest", 0, 0,
                 demands: new[] { food, planks });
 
+            // Brasov's factory turns wood into planks.
             Node brasov = new Node(2, "Brasov", 1, 7,
-                demands: new[] { steel, wood });
+                demands: new[] { steel, wood },
+                factory: new Factory(wood, planks));
 
+            // Sibiu's factory turns iron ore into steel.
             Node sibiu = new Node(3, "Sibiu", 8, 7,
-                demands: new[] { ironOre, planks });
+                demands: new[] { ironOre, planks },
+                factory: new Factory(ironOre, steel));
 
             Node cluj = new Node(4, "Cluj", 9, 0,
                 demands: new[] { food, wood });

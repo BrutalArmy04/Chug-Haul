@@ -305,6 +305,73 @@ namespace ChugHaul.Core.Tests
             Assert.Throws<ArgumentException>(() => new DemandSystem(network, bad));
         }
 
+        // ---------- TryConsume and factory inputs ----------
+
+        [Test]
+        public void TryConsume_RemovesOneUnitAndFiresEvent()
+        {
+            demand.TryAccept(city, food);
+            demand.TryAccept(city, food);
+            var freeValues = new List<int>();
+            demand.DemandChanged += (n, c, free) => freeValues.Add(free);
+
+            bool consumed = demand.TryConsume(city, food);
+
+            Assert.That(consumed, Is.True);
+            Assert.That(demand.FreeSlots(city, food), Is.EqualTo(config.DemandSlots - 1));
+            Assert.That(freeValues, Is.EqualTo(new[] { config.DemandSlots - 1 }));
+        }
+
+        [Test]
+        public void TryConsume_EmptyStock_ReturnsFalseAndRaisesNothing()
+        {
+            int events = 0;
+            demand.DemandChanged += (n, c, free) => events++;
+
+            Assert.That(demand.TryConsume(city, food), Is.False);
+            Assert.That(demand.FreeSlots(city, food), Is.EqualTo(config.DemandSlots));
+            Assert.That(events, Is.EqualTo(0));
+        }
+
+        [Test]
+        public void TryConsume_NoStockForThatCargo_ReturnsFalse()
+        {
+            Assert.That(demand.TryConsume(city, passengers), Is.False);
+            Assert.That(demand.TryConsume(city, mail), Is.False);
+        }
+
+        [Test]
+        public void NodeFactoryInput_IsNotConsumedByTheCity_WithoutAnyPredicate()
+        {
+            var plant = new Node(5, "Plant", 0, 0,
+                demands: new[] { food },
+                factory: new Factory(food, mail));
+            var net = new Network(new[] { plant }, new Line[0]);
+            var system = new DemandSystem(net, config);
+            system.TryAccept(plant, food);
+
+            system.Tick(10 * config.CityConsumeInterval);
+
+            Assert.That(system.FreeSlots(plant, food), Is.EqualTo(config.DemandSlots - 1));
+        }
+
+        [Test]
+        public void NodeFactoryInput_DoesNotBankTime_ForWhenItIsConsumedAgain()
+        {
+            var plant = new Node(5, "Plant", 0, 0,
+                demands: new[] { food },
+                factory: new Factory(food, mail));
+            var net = new Network(new[] { plant }, new Line[0]);
+            var system = new DemandSystem(net, config);
+            system.TryAccept(plant, food);
+            system.Tick(10 * config.CityConsumeInterval);
+
+            // Nothing was counted while the factory owned this stock.
+            Assert.That(system.FreeSlots(plant, food), Is.EqualTo(config.DemandSlots - 1));
+            Assert.That(system.TryConsume(plant, food), Is.True);
+            Assert.That(system.FreeSlots(plant, food), Is.EqualTo(config.DemandSlots));
+        }
+
         // ---------- Economy.Tick ----------
 
         [Test]

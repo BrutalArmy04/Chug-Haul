@@ -35,7 +35,8 @@ namespace ChugHaul.Core
 
         /// <summary>
         /// Cargo that a factory consumes itself; cities skip consuming it.
-        /// Set by the factory task. Defaults to "never".
+        /// A node's own Factory.Input is always skipped, with or without this predicate.
+        /// Defaults to "never".
         /// </summary>
         public Func<Node, CargoType, bool> IsFactoryInput { get; set; }
 
@@ -105,6 +106,25 @@ namespace ChugHaul.Core
         }
 
         /// <summary>
+        /// Removes one stored unit, freeing a slot. Used by a city's factory to take its input.
+        /// Returns false, changing nothing, if the stock is empty or does not exist.
+        /// Raises DemandChanged.
+        /// </summary>
+        public bool TryConsume(Node node, CargoType cargo)
+        {
+            Stock stock = FindStock(node, cargo);
+            if (stock == null || stock.Stored == 0) return false;
+
+            stock.Stored--;
+            if (stock.Stored == 0)
+                stock.Timer = 0f;
+
+            DemandChanged?.Invoke(node, cargo, config.DemandSlots - stock.Stored);
+
+            return true;
+        }
+
+        /// <summary>
         /// Advances consumption by dt seconds. A stock's timer only runs while it holds
         /// something, and leftover time is kept, so large dt steps consume correctly.
         /// </summary>
@@ -118,7 +138,7 @@ namespace ChugHaul.Core
             foreach (Stock stock in stocks)
             {
                 if (stock.Stored == 0) continue;
-                if (IsFactoryInput != null && IsFactoryInput(stock.Node, stock.Cargo)) continue;
+                if (IsFactoryInputOf(stock)) continue;
 
                 stock.Timer += dt;
 
@@ -134,6 +154,16 @@ namespace ChugHaul.Core
                 if (stock.Stored == 0)
                     stock.Timer = 0f;
             }
+        }
+
+        // A city's factory consumes its own input (FactorySystem), so the city must not.
+        // The settable IsFactoryInput predicate can still add more cases.
+        private bool IsFactoryInputOf(Stock stock)
+        {
+            Factory factory = stock.Node.Factory;
+            if (factory != null && factory.Input.Id == stock.Cargo.Id) return true;
+
+            return IsFactoryInput != null && IsFactoryInput(stock.Node, stock.Cargo);
         }
 
         private Stock FindStock(Node node, CargoType cargo)

@@ -29,6 +29,7 @@ namespace ChugHaul.Core
             Demand = new DemandSystem(this.network, this.config);
             Depot = new DepotSystem(this.network, Cargos, this.config);
             Production = new ProductionSystem(this.network, Depot, this.config);
+            Factories = new FactorySystem(this.network, Demand, Depot, this.config);
         }
 
         /// <summary>Every cargo kind in the game.</summary>
@@ -39,6 +40,9 @@ namespace ChugHaul.Core
 
         /// <summary>Industries making cargo into their depots.</summary>
         public ProductionSystem Production { get; }
+
+        /// <summary>City factories turning raw material into products.</summary>
+        public FactorySystem Factories { get; }
 
         /// <summary>What a train could load at this node right now.</summary>
         public IReadOnlyList<OfferItem> GetOffer(Node node)
@@ -54,6 +58,7 @@ namespace ChugHaul.Core
         {
             Demand.Tick(dt);
             Production.Tick(dt);
+            Factories.Tick(dt);
         }
 
         public BuyResult TryBuyLine(int lineId)
