@@ -203,7 +203,7 @@ namespace ChugHaul.Core.Tests
                 .OrderBy(name => name)
                 .ToArray();
 
-            Assert.That(industryCargo, Is.EqualTo(new[] { "Food", "Iron ore", "Wood" }));
+            Assert.That(industryCargo, Is.EqualTo(new[] { "Grain", "Logs", "Ore" }));
         }
 
         [Test]

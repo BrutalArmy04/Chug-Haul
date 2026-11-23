@@ -351,7 +351,7 @@ namespace ChugHaul.Core.Tests
         {
             var cfg = new EconomyConfig();
             var all = new CargoCatalog(cfg.Cargos);
-            CargoType grain = all.GetByName("Food");
+            CargoType grain = all.GetByName("Grain");
             Node ownFarm = new Node(1, "Farm", 0, 0, produces: new[] { grain }, kind: NodeKind.Industry);
             var net = new Network(new[] { ownFarm }, new Line[0]);
             var economy = new Economy(new GameState(100), net, cfg);

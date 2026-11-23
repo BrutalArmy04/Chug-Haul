@@ -22,13 +22,13 @@ namespace ChugHaul.Core
             // Basic goods
             new CargoType(1, "Passengers", 5, 1, isPassengers: true),
             new CargoType(2, "Mail", 8, 1),
-            new CargoType(3, "Food", 10, 2),
-            // Raw goods
-            new CargoType(4, "Wood", 6, 3),
-            new CargoType(5, "Iron ore", 7, 4),
-            // Processed goods
-            new CargoType(6, "Planks", 12, 3),
-            new CargoType(7, "Steel", 15, 4),
+            // Raw goods (made by industries)
+            new CargoType(3, "Grain", 6, 3),
+            new CargoType(4, "Logs", 6, 3),
+            new CargoType(5, "Ore", 7, 4),
+            // Processed goods (made by city factories)
+            new CargoType(6, "Food", 10, 2),   // Grain -> Food
+            new CargoType(7, "Lumber", 12, 3), // Logs -> Lumber
         };
 
         public int LocomotiveMass = 5;

@@ -430,8 +430,8 @@ namespace ChugHaul.Core.Tests
         {
             var cfg = new EconomyConfig();
             var all = new CargoCatalog(cfg.Cargos);
-            CargoType w = all.GetByName("Wood");
-            CargoType p = all.GetByName("Planks");
+            CargoType w = all.GetByName("Logs");
+            CargoType p = all.GetByName("Lumber");
 
             var forest = new Node(1, "Forest", 0, 0,
                 produces: new[] { w }, kind: NodeKind.Industry);
@@ -519,13 +519,14 @@ namespace ChugHaul.Core.Tests
             var cfg = new EconomyConfig();
             var eco = new Economy(state, map, cfg);
             Node brasov = map.GetNode(2);
-            CargoType wood = eco.Cargos.GetByName("Wood");
-            CargoType planksCargo = eco.Cargos.GetByName("Planks");
+            CargoType grain = eco.Cargos.GetByName("Grain");
+            CargoType foodCargo = eco.Cargos.GetByName("Food");
 
-            eco.Demand.TryAccept(brasov, wood);
+            // Brasov's factory turns Grain into Food.
+            eco.Demand.TryAccept(brasov, grain);
             eco.Tick(cfg.FactoryInterval);
 
-            Assert.That(eco.Depot.Count(brasov, planksCargo), Is.EqualTo(1));
+            Assert.That(eco.Depot.Count(brasov, foodCargo), Is.EqualTo(1));
         }
     }
 }

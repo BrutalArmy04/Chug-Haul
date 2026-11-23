@@ -405,10 +405,10 @@ namespace ChugHaul.Core.Tests
         {
             BuyLineAndTrain();
             CargoType food = Kind("Food");
-            CargoType steel = Kind("Steel");
-            Stock(nodeA, food, 2); // no steel
+            CargoType ore = Kind("Ore");
+            Stock(nodeA, food, 2); // no ore
 
-            DispatchResult result = economy.TryDispatch(1, nodeB, Load(food, steel));
+            DispatchResult result = economy.TryDispatch(1, nodeB, Load(food, ore));
 
             Assert.That(result, Is.EqualTo(DispatchResult.NotInStock));
             Assert.That(economy.Depot.Count(nodeA, food), Is.EqualTo(2));
@@ -472,19 +472,19 @@ namespace ChugHaul.Core.Tests
         {
             BuyLineAndTrain();
             CargoType food = Kind("Food");
-            CargoType steel = Kind("Steel");
+            CargoType ore = Kind("Ore");
             Stock(nodeA, food, 3);
-            Stock(nodeA, steel, 1);
+            Stock(nodeA, ore, 1);
 
             var seen = new List<(CargoType, int)>();
             economy.Depot.DepotChanged += (n, c, count) => seen.Add((c, count));
 
-            economy.TryDispatch(1, nodeB, Load(food, steel, food));
+            economy.TryDispatch(1, nodeB, Load(food, ore, food));
 
             Assert.That(seen.Count, Is.EqualTo(2));
             Assert.That(seen[0].Item1, Is.SameAs(food));
             Assert.That(seen[0].Item2, Is.EqualTo(1));
-            Assert.That(seen[1].Item1, Is.SameAs(steel));
+            Assert.That(seen[1].Item1, Is.SameAs(ore));
             Assert.That(seen[1].Item2, Is.EqualTo(0));
         }
 
@@ -540,14 +540,14 @@ namespace ChugHaul.Core.Tests
         {
             BuyLineAndTrain();
             CargoType food = Kind("Food");
-            CargoType steel = Kind("Steel");
-            Assert.That(steel.WagonMass, Is.Not.EqualTo(food.WagonMass));
+            CargoType ore = Kind("Ore");
+            Assert.That(ore.WagonMass, Is.Not.EqualTo(food.WagonMass));
 
             int foodMass = MassOnTrip(nodeA, nodeB, food, food);
-            int steelMass = MassOnTrip(nodeB, nodeA, steel, steel);
+            int oreMass = MassOnTrip(nodeB, nodeA, ore, ore);
 
             Assert.That(foodMass, Is.EqualTo(config.LocomotiveMass + 2 * food.WagonMass));
-            Assert.That(steelMass, Is.EqualTo(config.LocomotiveMass + 2 * steel.WagonMass));
+            Assert.That(oreMass, Is.EqualTo(config.LocomotiveMass + 2 * ore.WagonMass));
         }
 
         [Test]
@@ -571,23 +571,23 @@ namespace ChugHaul.Core.Tests
             public Node Farm;
             public Node Town;
             public CargoType Food;
-            public CargoType Steel;
+            public CargoType Ore;
             public CargoType Passengers;
         }
 
-        // Farm produces food, steel and passengers. Town wants food and passengers,
-        // and does not want steel. One active line with a train, at the farm.
+        // Farm produces food, ore and passengers. Town wants food and passengers,
+        // and does not want ore. One active line with a train, at the farm.
         private static Scene BuildScene(EconomyConfig cfg = null)
         {
             cfg = cfg ?? new EconomyConfig();
             var catalog = new CargoCatalog(cfg.Cargos);
             CargoType food = catalog.GetByName("Food");
-            CargoType steel = catalog.GetByName("Steel");
+            CargoType ore = catalog.GetByName("Ore");
             CargoType mail = catalog.GetByName("Mail");
             CargoType passengers = catalog.GetByName("Passengers");
 
             var farm = new Node(1, "Farm", 0f, 0f,
-                produces: new[] { food, steel, passengers },
+                produces: new[] { food, ore, passengers },
                 demands: new[] { mail });
             var town = new Node(2, "Town", 3f, 4f,
                 produces: new[] { mail },
@@ -609,7 +609,7 @@ namespace ChugHaul.Core.Tests
                 Farm = farm,
                 Town = town,
                 Food = food,
-                Steel = steel,
+                Ore = ore,
                 Passengers = passengers
             };
         }
@@ -689,16 +689,16 @@ namespace ChugHaul.Core.Tests
         public void Delivery_CargoTheNodeDoesNotWant_IsUnpaidAndLandsInDepot()
         {
             Scene s = BuildScene();
-            Dispatch(s, s.Steel);
+            Dispatch(s, s.Ore);
 
             DeliveryResult result = s.Eco.CompleteTrip(1);
 
             Assert.That(result.Wagons[0].Coins, Is.EqualTo(0));
             Assert.That(result.Wagons[0].StoredInDepot, Is.True);
             Assert.That(result.Total, Is.EqualTo(0));
-            Assert.That(s.Eco.Depot.Count(s.Town, s.Steel), Is.EqualTo(1));
+            Assert.That(s.Eco.Depot.Count(s.Town, s.Ore), Is.EqualTo(1));
             // The cargo changed trains: it is now on offer at the town.
-            Assert.That(s.Eco.GetOffer(s.Town)[0].Cargo, Is.SameAs(s.Steel));
+            Assert.That(s.Eco.GetOffer(s.Town)[0].Cargo, Is.SameAs(s.Ore));
         }
 
         [Test]
@@ -706,8 +706,8 @@ namespace ChugHaul.Core.Tests
         {
             Scene s = BuildScene();
             for (int i = 0; i < s.Config.DepotCapacity; i++)
-                s.Eco.Depot.Add(s.Town, s.Steel);
-            Dispatch(s, s.Steel);
+                s.Eco.Depot.Add(s.Town, s.Ore);
+            Dispatch(s, s.Ore);
             int coinsBefore = s.State.Coins;
 
             DeliveryResult result = null;
@@ -718,7 +718,7 @@ namespace ChugHaul.Core.Tests
             Assert.That(result.Wagons[0].Coins, Is.EqualTo(0));
             Assert.That(result.Total, Is.EqualTo(0));
             Assert.That(s.State.Coins, Is.EqualTo(coinsBefore));
-            Assert.That(s.Eco.Depot.Count(s.Town, s.Steel), Is.EqualTo(s.Config.DepotCapacity));
+            Assert.That(s.Eco.Depot.Count(s.Town, s.Ore), Is.EqualTo(s.Config.DepotCapacity));
         }
 
         [Test]
@@ -832,7 +832,7 @@ namespace ChugHaul.Core.Tests
         public void Preview_EqualsRealDelivery_AndChangesNothing()
         {
             Scene s = BuildScene();
-            Dispatch(s, s.Food, s.Food, s.Steel);
+            Dispatch(s, s.Food, s.Food, s.Ore);
             Train train = s.Eco.GetTrain(1);
 
             int demandEvents = 0, depotEvents = 0, arrivedEvents = 0;
@@ -843,14 +843,14 @@ namespace ChugHaul.Core.Tests
             int coins = s.State.Coins;
             int freeSlots = s.Eco.Demand.FreeSlots(s.Town, s.Food);
             int foodInDepot = s.Eco.Depot.Count(s.Town, s.Food);
-            int steelInDepot = s.Eco.Depot.Count(s.Town, s.Steel);
+            int oreInDepot = s.Eco.Depot.Count(s.Town, s.Ore);
 
             DeliveryResult preview = s.Eco.PreviewDelivery(train, s.Town, train.Cargo);
 
             Assert.That(s.State.Coins, Is.EqualTo(coins));
             Assert.That(s.Eco.Demand.FreeSlots(s.Town, s.Food), Is.EqualTo(freeSlots));
             Assert.That(s.Eco.Depot.Count(s.Town, s.Food), Is.EqualTo(foodInDepot));
-            Assert.That(s.Eco.Depot.Count(s.Town, s.Steel), Is.EqualTo(steelInDepot));
+            Assert.That(s.Eco.Depot.Count(s.Town, s.Ore), Is.EqualTo(oreInDepot));
             Assert.That(demandEvents + depotEvents + arrivedEvents, Is.EqualTo(0));
             Assert.That(train.State, Is.EqualTo(TrainState.Travelling));
             Assert.That(train.Cargo.Count, Is.EqualTo(3));
@@ -858,7 +858,7 @@ namespace ChugHaul.Core.Tests
             DeliveryResult real = s.Eco.CompleteTrip(1);
 
             AssertSameDelivery(preview, real);
-            Assert.That(real.Total, Is.EqualTo(27)); // food 15 + 12, steel unpaid
+            Assert.That(real.Total, Is.EqualTo(27)); // food 15 + 12, ore unpaid
         }
 
         [Test]
@@ -883,8 +883,8 @@ namespace ChugHaul.Core.Tests
         public void Preview_CountsDepotRoomUsedByEarlierWagonsOfTheSameLoad()
         {
             Scene s = BuildScene(new EconomyConfig { DepotCapacity = 2 });
-            s.Eco.Depot.Add(s.Town, s.Steel); // one of two places already used
-            Dispatch(s, s.Steel, s.Steel);
+            s.Eco.Depot.Add(s.Town, s.Ore); // one of two places already used
+            Dispatch(s, s.Ore, s.Ore);
             Train train = s.Eco.GetTrain(1);
 
             DeliveryResult preview = s.Eco.PreviewDelivery(train, s.Town, train.Cargo);
@@ -895,7 +895,7 @@ namespace ChugHaul.Core.Tests
             DeliveryResult real = s.Eco.CompleteTrip(1);
 
             AssertSameDelivery(preview, real);
-            Assert.That(s.Eco.Depot.Count(s.Town, s.Steel), Is.EqualTo(2));
+            Assert.That(s.Eco.Depot.Count(s.Town, s.Ore), Is.EqualTo(2));
         }
 
         [Test]
