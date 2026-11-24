@@ -7,7 +7,8 @@ namespace ChugHaul.View
     // Shows one Core train. It waits at its stop until Core dispatches it (TrainDeparted), then
     // walks the path segment by segment, turning at middle stops without stopping, and calls
     // CompleteTrip once at the destination. Core decides everything else.
-    public class TrainView : MonoBehaviour
+    // Selectable: Id is the train's line id (one train per line); clicking it opens its orders.
+    public class TrainView : SelectableView
     {
         [SerializeField] float speed = 8f;
         [SerializeField] float turnSpeed = 6f;
@@ -46,6 +47,7 @@ namespace ChugHaul.View
             this.economy = economy;
             this.train = train;
             this.stopPadding = stopPadding;
+            Id = train.Line.Id;
 
             // Stand as if the train had just arrived at its stop from a neighbouring stop.
             Line line = train.Line;

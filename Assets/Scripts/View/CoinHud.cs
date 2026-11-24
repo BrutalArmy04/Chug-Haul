@@ -107,6 +107,23 @@ namespace ChugHaul.View
             ShowMessage(msg);
         }
 
+        // Called from the bootstrap with StationPanel.DispatchAttempted. A departing train needs no message.
+        public void ShowDispatchResult(DispatchResult result)
+        {
+            string msg = result switch
+            {
+                DispatchResult.Ok => null,
+                DispatchResult.NoTrain => "This line has no train",
+                DispatchResult.NotAtStop => "The train is already travelling",
+                DispatchResult.NotOnLine => "That stop isn't on this line",
+                DispatchResult.SameStop => "The train is already there",
+                DispatchResult.OverCapacity => "Too many wagons for this train",
+                DispatchResult.NotInStock => "Not enough of that in stock",
+                _ => result.ToString()
+            };
+            if (msg != null) ShowMessage(msg);
+        }
+
         void ShowMessage(string msg)
         {
             messageText.text = msg;
