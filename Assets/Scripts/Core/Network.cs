@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ChugHaul.Core
 {
@@ -48,14 +47,22 @@ namespace ChugHaul.Core
                 if (!linesById.TryAdd(line.Id, line))
                     throw new ArgumentException($"Duplicate line ID: {line.Id}");
 
-                if (ReferenceEquals(line.NodeA, line.NodeB))
-                    throw new ArgumentException("A line cannot connect a node to itself.");
+                if (line.Stops.Count < 2)
+                    throw new ArgumentException($"Line {line.Id} needs at least 2 stops.");
 
-                if (!nodesById.ContainsValue(line.NodeA) ||
-                    !nodesById.ContainsValue(line.NodeB))
+                var seen = new HashSet<Node>();
+                foreach (Node stop in line.Stops)
                 {
-                    throw new ArgumentException(
-                        $"Line {line.Id} references a node outside the network.");
+                    if (!seen.Add(stop))
+                        throw new ArgumentException(
+                            $"Line {line.Id} visits node {stop.Id} more than once.");
+
+                    if (!nodesById.TryGetValue(stop.Id, out Node known) ||
+                        !ReferenceEquals(known, stop))
+                    {
+                        throw new ArgumentException(
+                            $"Line {line.Id} references a node outside the network.");
+                    }
                 }
             }
 
@@ -76,17 +83,15 @@ namespace ChugHaul.Core
             return line;
         }
 
+        /// <summary>All lines that stop at this node, including as a middle stop.</summary>
         public IReadOnlyList<Line> LinesAt(Node node)
         {
             List<Line> result = new List<Line>();
 
             foreach (Line line in lines)
             {
-                if (ReferenceEquals(line.NodeA, node) ||
-                    ReferenceEquals(line.NodeB, node))
-                {
+                if (line.IndexOf(node) >= 0)
                     result.Add(line);
-                }
             }
 
             return result.AsReadOnly();

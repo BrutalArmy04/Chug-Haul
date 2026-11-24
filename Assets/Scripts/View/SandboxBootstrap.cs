@@ -63,7 +63,10 @@ namespace ChugHaul.View
             var go = Instantiate(trainPrefab, a, Quaternion.identity, trainsParent);
             var train = go.GetComponent<TrainView>();
             train.Init(line.Id, a, b, endPadding);
-            train.Arrived += id => economy.OnTrainArrived(id);
+            // train.Arrived += id => economy.OnTrainArrived(id);
+            // This line of code is the only change I made to your code (obviously excluding these comments which don't affect the code)
+            // I had to comment it since it uses OnTrainArrived and which I had to remove as a part of my tasks
+            // Now you have to call TryBuyLine followed by TryBuyTrain followed by TryDispatch, which starts the trip, followed by CompleteTrip which finally pays the money based on the wagons from TryDispatch
         }
 
         void OnDestroy()

@@ -4,6 +4,8 @@ namespace ChugHaul.Core
     {
         Ok,
         AlreadyActive,
-        NotEnoughCoins
+        NotEnoughCoins,
+        LineNotActive,
+        AlreadyHasTrain
     }
 }
