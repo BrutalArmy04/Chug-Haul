@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using ChugHaul.Core;
@@ -23,18 +24,29 @@ namespace ChugHaul.View
         [SerializeField] float punchScale = 1.2f;
         [SerializeField] float punchDuration = 0.2f;
 
+        [Header("Deliveries")]
+        [SerializeField] float deliveryPopupHeight = 2.5f;   // world units above the station
+        [SerializeField] float deliveryPopupDuration = 2f;
+        [SerializeField] Color unpaidColor = new Color(0.8f, 0.8f, 0.8f); // a trip that earned nothing
+
         int lastCoins;
         bool hasLast; // false until the first value is shown
         Coroutine punchRoutine;
         readonly List<GameObject> activePopups = new List<GameObject>();
 
         GameState state;
+        Economy economy;
+        Camera cam;
+        Color coinColor; // the counter's normal colour, from the scene
         Coroutine messageRoutine;
 
-        public void Init(GameState state)
+        void Awake() { coinColor = coinText.color; }
+
+        public void Init(GameState state, Economy economy)
         {
             Unsubscribe();
             this.state = state;
+            this.economy = economy;
             if (isActiveAndEnabled) Subscribe();
         }
 
@@ -52,6 +64,11 @@ namespace ChugHaul.View
         {
             state.MoneyChanged -= OnMoneyChanged; // guard against double subscription
             state.MoneyChanged += OnMoneyChanged;
+            if (economy != null)
+            {
+                economy.TrainArrived -= OnTrainArrived;
+                economy.TrainArrived += OnTrainArrived;
+            }
             hasLast = false; // reset the last value so we don't spawn a popup on re-enable
             OnMoneyChanged(state.Coins); // show the current value right away
         }
@@ -59,12 +76,14 @@ namespace ChugHaul.View
         void Unsubscribe()
         {
             if (state != null) state.MoneyChanged -= OnMoneyChanged;
+            if (economy != null) economy.TrainArrived -= OnTrainArrived;
             hasLast = false;
         }
 
         void OnMoneyChanged(int coins)
         {
             coinText.text = $"Coins: {coins}";
+            coinText.color = coins < 0 ? spendColor : coinColor; // red while in debt
 
             if (hasLast && coins != lastCoins)
             {
@@ -130,6 +149,75 @@ namespace ChugHaul.View
             {
                 float k = t / popupDuration;
                 rt.anchoredPosition = start + Vector2.up * (popupRise * k);
+                popup.color = new Color(c.r, c.g, c.b, 1f - k);
+                yield return null;
+            }
+            activePopups.Remove(popup.gameObject);
+            Destroy(popup.gameObject);
+        }
+
+        // Above the station the train arrived at: what the trip earned and what happened to each
+        // wagon. Everything comes from Core's DeliveryResult; nothing is computed here.
+        void OnTrainArrived(Train train, DeliveryResult result)
+        {
+            Node stop = train.CurrentStop; // Core has already moved the train to its destination
+            var anchor = new Vector3(stop.X, deliveryPopupHeight, stop.Z);
+            SpawnWorldPopup(anchor, DeliveryText(result), result.Total > 0 ? gainColor : unpaidColor);
+        }
+
+        // "+34  3× Food", then a line each for unpaid wagons: "1× Grain → depot", "1× Ore lost".
+        static string DeliveryText(DeliveryResult result)
+        {
+            string sold = Wagons(result, WagonOutcome.Sold);
+            string text = $"+{result.Total}  " + (result.Wagons.Count == 0 ? "(empty)" : sold);
+
+            string stored = Wagons(result, WagonOutcome.StoredInDepot);
+            if (stored.Length > 0) text += $"\n{stored} → depot";
+
+            string lost = Wagons(result, WagonOutcome.Lost);
+            if (lost.Length > 0) text += $"\n{lost} lost";
+
+            return text.TrimEnd();
+        }
+
+        // "3× Food, 1× Grain" for the wagons with this outcome, in load order.
+        static string Wagons(DeliveryResult result, WagonOutcome outcome)
+        {
+            return string.Join(", ", result.Wagons
+                .Where(w => w.Outcome == outcome)
+                .GroupBy(w => w.Cargo.Name)
+                .Select(g => $"{g.Count()}× {g.Key}"));
+        }
+
+        void SpawnWorldPopup(Vector3 world, string text, Color color)
+        {
+            if (popupTemplate == null) return;
+            if (cam == null) cam = Camera.main;
+            if (cam == null) return;
+
+            var popup = Instantiate(popupTemplate, popupTemplate.transform.parent);
+            popup.gameObject.SetActive(true);
+            popup.text = text;
+            popup.color = color;
+            popup.alignment = TextAlignmentOptions.Bottom;          // centred above its point, extra lines grow up
+            popup.textWrappingMode = TextWrappingModes.NoWrap;
+            activePopups.Add(popup.gameObject);
+            StartCoroutine(WorldPopupRoutine(popup, world));
+        }
+
+        // Stays on its point of the map while the camera moves, rising and fading out.
+        IEnumerator WorldPopupRoutine(TMP_Text popup, Vector3 world)
+        {
+            var rt = popup.rectTransform;
+            Color c = popup.color;
+            float scale = popup.canvas != null ? popup.canvas.scaleFactor : 1f; // overlay canvas: position is in screen pixels
+
+            for (float t = 0f; t < deliveryPopupDuration; t += Time.deltaTime)
+            {
+                float k = t / deliveryPopupDuration;
+                Vector3 screen = cam.WorldToScreenPoint(world);
+                popup.enabled = screen.z > 0f; // hidden while its point is behind the camera
+                rt.position = new Vector3(screen.x, screen.y + popupRise * scale * k, 0f);
                 popup.color = new Color(c.r, c.g, c.b, 1f - k);
                 yield return null;
             }

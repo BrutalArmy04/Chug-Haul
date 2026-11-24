@@ -53,8 +53,11 @@ namespace ChugHaul.View
 
             selection.Init(economy);
 
-            hud.Init(state);
+            hud.Init(state, economy);
             selection.PurchaseAttempted += hud.ShowPurchaseResult;
+
+            // The only Tick caller. Added last, so the first Tick runs on a fully set-up scene.
+            gameObject.AddComponent<SimulationDriver>().Init(economy);
         }
 
         void SpawnTrain(Train train)
@@ -62,13 +65,16 @@ namespace ChugHaul.View
             var go = Instantiate(trainPrefab, trainsParent);
             go.name = $"Train_{train.Line.Id}";
             go.GetComponent<TrainView>().Init(economy, train, endPadding);
+            if (go.TryGetComponent(out WagonsView wagons)) wagons.Init(economy, train);
         }
 
         // ---- TEMPORARY test keys. Remove before the PR: the buy prompt and station panel replace them. ----
         // M: +500 coins.   B: buy every line (some can't be clicked on the current test map).
         // T: buy a train on every bought line that has none.
-        // 1-9: send every waiting train to that stop of its line (1 = first stop).
+        // 1-9: send every waiting train to that stop of its line (1 = first stop), loaded with
+        //      whatever its current stop has in stock, up to the train's capacity.
         // F: cap the frame rate at 30 / 144 FPS. Every trip logs how long it took.
+        // X: game speed 1x / 5x (production takes 20 s a unit).
         readonly Dictionary<Train, float> testDepartures = new Dictionary<Train, float>();
 
         void OnTestDeparted(Train train) => testDepartures[train] = Time.time;
@@ -99,6 +105,9 @@ namespace ChugHaul.View
             if (keyboard.fKey.wasPressedThisFrame)
                 Application.targetFrameRate = Application.targetFrameRate == 30 ? 144 : 30;
 
+            if (keyboard.xKey.wasPressedThisFrame)
+                Time.timeScale = Time.timeScale > 1f ? 1f : 5f;
+
             if (keyboard.tKey.wasPressedThisFrame)
             {
                 foreach (Line line in network.Lines)
@@ -117,9 +126,19 @@ namespace ChugHaul.View
                     Train train = economy.GetTrain(line.Id);
                     if (train == null || train.State != TrainState.AtStop || k >= line.Stops.Count) continue;
 
-                    Debug.Log($"[test] Line {line.Id}: go to {line.Stops[k].Name} -> {economy.TryDispatch(line.Id, line.Stops[k])}");
+                    Cargo load = TestLoadFromDepot(train);
+                    Debug.Log($"[test] Line {line.Id}: go to {line.Stops[k].Name} with {load.Count} wagons -> {economy.TryDispatch(line.Id, line.Stops[k], load)}");
                 }
             }
+        }
+
+        Cargo TestLoadFromDepot(Train train)
+        {
+            var wagons = new List<CargoType>();
+            foreach (OfferItem item in economy.GetOffer(train.CurrentStop))
+                for (int i = 0; i < item.Count && wagons.Count < train.Capacity; i++)
+                    wagons.Add(item.Cargo);
+            return new Cargo(wagons);
         }
         // ---- end of TEMPORARY test keys ----
 
@@ -132,6 +151,7 @@ namespace ChugHaul.View
                 economy.TrainDeparted -= OnTestDeparted;  // TEMPORARY test
                 economy.TrainArrived -= OnTestArrived;    // TEMPORARY test
             }
+            Time.timeScale = 1f;                          // TEMPORARY test (X key)
             if (selection != null) selection.PurchaseAttempted -= hud.ShowPurchaseResult;
         }
     }

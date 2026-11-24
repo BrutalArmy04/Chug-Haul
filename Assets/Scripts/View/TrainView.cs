@@ -30,6 +30,11 @@ namespace ChugHaul.View
         readonly List<int> waypointSegment = new List<int>(); // index in path of the segment each waypoint is on
         int next = -1; // waypoint being approached; -1 = standing still
 
+        // Where this trip started plus every waypoint reached so far. With the current position
+        // it is exactly the track driven, corners included. Wagons follow it.
+        readonly List<Vector3> trail = new List<Vector3>();
+        public IReadOnlyList<Vector3> Trail => trail;
+
         Vector3 desiredDir;
         Vector3 markerRest;
 
@@ -89,6 +94,9 @@ namespace ChugHaul.View
             Segment last = path[path.Count - 1];
             AddWaypoint(StopPoint(last.To, last.From), path.Count - 1);
 
+            trail.Clear();
+            trail.Add(transform.position);
+
             next = 0;
             RefreshMarker();
         }
@@ -136,6 +144,7 @@ namespace ChugHaul.View
                 }
 
                 transform.position = waypoints[next];
+                trail.Add(waypoints[next]);
                 distance -= remaining;
                 next++;
             }
