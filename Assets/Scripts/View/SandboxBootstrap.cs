@@ -17,8 +17,10 @@ namespace ChugHaul.View
         [SerializeField] float endPadding = 2f; // how far before a stop's centre trains halt
         [SerializeField] CoinHud hud;
         [SerializeField] StationPanel stationPanel; // instance of Prefabs/UI/StationPanel under the HUD canvas
+        [SerializeField] NodePanel nodePanel;       // instance of Prefabs/UI/NodePanel under the HUD canvas
         GameState state;
         Network network;
+        EconomyConfig config; // shared with the panels, which show capacities and prices from it
 
         readonly Dictionary<int, LineView> views = new Dictionary<int, LineView>();
         Economy economy; // field so OnDestroy can see it
@@ -28,7 +30,8 @@ namespace ChugHaul.View
         {
             state = new GameState(startCoins);
             network = TestMap.Create();
-            economy = new Economy(state, network);
+            config = new EconomyConfig();
+            economy = new Economy(state, network, config);
 
             foreach (var node in network.Nodes)
             {
@@ -59,6 +62,7 @@ namespace ChugHaul.View
 
             stationPanel.Init(economy);
             stationPanel.DispatchAttempted += hud.ShowDispatchResult;
+            nodePanel.Init(economy, config); // before the first Tick, so it sees every stall
             selection.SelectionChanged += OnSelectionChanged;
 
             // The only Tick caller. Added last, so the first Tick runs on a fully set-up scene.
@@ -73,14 +77,18 @@ namespace ChugHaul.View
             if (go.TryGetComponent(out WagonsView wagons)) wagons.Init(economy, train);
         }
 
-        // Clicking a waiting train opens its orders; any other click closes them.
-        // (Clicking a station is left to the node panel; several trains can wait at one station.)
+        // Clicking a waiting train opens its orders, clicking a city or industry opens its info;
+        // any other click closes them. (Several trains can wait at one station, so a station
+        // click shows the node, not a train.)
         void OnSelectionChanged(SelectableView selected)
         {
-            Train train = selected is TrainView view ? economy.GetTrain(view.Id) : null;
-
+            Train train = selected is TrainView trainView ? economy.GetTrain(trainView.Id) : null;
             if (train != null && train.State == TrainState.AtStop) stationPanel.Open(train);
             else stationPanel.Close();
+
+            Node node = selected is NodeView nodeView ? network.GetNode(nodeView.Id) : null;
+            if (node != null) nodePanel.Open(node);
+            else nodePanel.Close();
         }
 
         // ---- TEMPORARY test keys. Remove before the PR: the buy prompt replaces them. ----
