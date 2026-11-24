@@ -37,16 +37,15 @@ namespace ChugHaul.Core.Tests
         public void LinesAt_ReturnsEveryLineThroughNode()
         {
             Network network = TestMap.Create();
-            Node brasov = network.GetNode(2);
+            Node bucharest = network.GetNode(1);
 
-            var result = network.LinesAt(brasov);
+            var result = network.LinesAt(bucharest);
 
-            // Line 1 ends here, line 2 starts here, line 5 passes through.
-            Assert.That(result.Count, Is.EqualTo(3));
-            Assert.That(result, Does.Contain(network.GetLine(1)));
-            Assert.That(result, Does.Contain(network.GetLine(2)));
+            // Line 4 starts here, line 5 passes through.
+            Assert.That(result.Count, Is.EqualTo(2));
+            Assert.That(result, Does.Contain(network.GetLine(4)));
             Assert.That(result, Does.Contain(network.GetLine(5)));
-            Assert.That(result, Has.No.Member(network.GetLine(4)));
+            Assert.That(result, Has.No.Member(network.GetLine(3)));
         }
 
         [Test]

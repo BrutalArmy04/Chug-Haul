@@ -13,9 +13,9 @@ namespace ChugHaul.Core
     ///                                                                /
     ///                                                               /   L7
     ///     (2) BRASOV  600 m                        (3) SIBIU  450 m
-    ///         O============= L2 (+ L5) ============O
+    ///         O================ L5 ================O
     ///        /^                                      \
-    ///       / ^ L1 (steep)                            \   L3
+    ///       / ^ L5 (steep)                            \   L3
     ///      /  ^                                        \
     ///     /                                             \                    (6) FOREST  700 m
     ///    /                                               \                          O
@@ -26,28 +26,32 @@ namespace ChugHaul.Core
     ///  O
     /// (5) FARM  60 m
     ///
+    /// Positions are spaced so that every segment is longer than two node buildings side by side
+    /// (shortest: about 7 units); otherwise the buildings' colliders hide the line from clicks.
+    ///
     /// id  node       kind      x   z   alt (m)  wants               makes / factory
     /// 1   Bucharest  City      0   0    80      Lumber, Ore
-    /// 2   Brasov     City      1   7   600      Grain, Lumber       factory: Grain -> Food
-    /// 3   Sibiu      City      8   7   450      Food, Grain
-    /// 4   Cluj       City      9   0   330      Logs, Food          factory: Logs -> Lumber
-    /// 5   Farm       Industry -3  -2    60      -                   Grain
-    /// 6   Forest     Industry 12   3   700      -                   Logs
-    /// 7   Mine       Industry 11   9   520      -                   Ore
+    /// 2   Brasov     City      2  14   600      Grain, Lumber       factory: Grain -> Food
+    /// 3   Sibiu      City     16  14   450      Food, Grain
+    /// 4   Cluj       City     18   0   330      Logs, Food          factory: Logs -> Lumber
+    /// 5   Farm       Industry -6  -4    60      -                   Grain
+    /// 6   Forest     Industry 24   6   700      -                   Logs
+    /// 7   Mine       Industry 22  18   520      -                   Ore
+    ///
+    /// Lines never share a segment: two lines on the same track would overlap and be
+    /// impossible to tell apart when clicked. (There is no L1 or L2: L5 runs that track.)
     ///
     /// line  stops (node ids)   cost  notes
-    /// L1    1 - 2              20    steep (80 m to 600 m)
-    /// L2    2 - 3              15
     /// L3    3 - 4              25
     /// L4    1 - 4              40    water crossing (river)
-    /// L5    5 - 1 - 2 - 3      70    4 stops: Farm, Bucharest, Brasov, Sibiu
+    /// L5    5 - 1 - 2 - 3      70    4 stops: Farm, Bucharest, Brasov, Sibiu. Bucharest - Brasov is steep (80 m to 600 m)
     /// L6    6 - 4              20    steep (700 m to 330 m)
     /// L7    7 - 3              20
     ///
     /// CHAINS
     /// Food:   Farm -L5-> Brasov (factory) -L5-> Bucharest (does not want Food: lands in its depot)
     ///         -L4-> Cluj (wants Food). Bucharest is the transfer between L5 and L4.
-    ///         (Sibiu also buys Food, directly from Brasov on L2/L5.)
+    ///         (Sibiu also buys Food, directly from Brasov on L5.)
     /// Lumber: Forest -L6-> Cluj (factory) -L4-> Bucharest (wants Lumber).
     /// Ore:    Mine -L7-> Sibiu (does not want Ore: depot) -L5-> Bucharest (wants Ore). Transfer at Sibiu.
     /// </summary>
@@ -69,36 +73,35 @@ namespace ChugHaul.Core
                 demands: new[] { lumber, ore });
 
             // Brasov's factory turns Grain into Food.
-            Node brasov = new Node(2, "Brasov", 1, 7,
+            Node brasov = new Node(2, "Brasov", 2, 14,
                 demands: new[] { grain, lumber },
                 factory: new Factory(grain, food));
 
-            Node sibiu = new Node(3, "Sibiu", 8, 7,
+            Node sibiu = new Node(3, "Sibiu", 16, 14,
                 demands: new[] { food, grain });
 
             // Cluj's factory turns Logs into Lumber.
-            Node cluj = new Node(4, "Cluj", 9, 0,
+            Node cluj = new Node(4, "Cluj", 18, 0,
                 demands: new[] { logs, food },
                 factory: new Factory(logs, lumber));
 
             // Raw-material industries: one cargo each, no demands.
-            Node farm = new Node(5, "Farm", -3, -2,
+            Node farm = new Node(5, "Farm", -6, -4,
                 produces: new[] { grain }, kind: NodeKind.Industry);
 
-            Node forest = new Node(6, "Forest", 12, 3,
+            Node forest = new Node(6, "Forest", 24, 6,
                 produces: new[] { logs }, kind: NodeKind.Industry);
 
-            Node mine = new Node(7, "Mine", 11, 9,
+            Node mine = new Node(7, "Mine", 22, 18,
                 produces: new[] { ore }, kind: NodeKind.Industry);
 
             // Costs are rough first values; they get balanced later.
-            Line line1 = new Line(1, new[] { bucharest, brasov }, 20);
-            Line line2 = new Line(2, new[] { brasov, sibiu }, 15);
+            // No line 1 or 2: line 5 runs Bucharest - Brasov - Sibiu, and lines never share track.
             Line line3 = new Line(3, new[] { sibiu, cluj }, 25);
             Line line4 = new Line(4, new[] { bucharest, cluj }, 40);
 
-            // 4-stop line, and the Farm's only way out. Brasov and Sibiu are middle or end stops
-            // shared with other lines.
+            // 4-stop line, and the Farm's only way out. Bucharest (middle stop) and Sibiu (end)
+            // are shared with other lines.
             Line line5 = new Line(5, new[] { farm, bucharest, brasov, sibiu }, 70);
 
             // Pickup lines for the other industries.
@@ -107,7 +110,7 @@ namespace ChugHaul.Core
 
             return new Network(
                 new[] { bucharest, brasov, sibiu, cluj, farm, forest, mine },
-                new[] { line1, line2, line3, line4, line5, line6, line7 }
+                new[] { line3, line4, line5, line6, line7 }
             );
         }
     }

@@ -22,11 +22,11 @@ namespace ChugHaul.Core.Tests
         public void LinesAt_FindsEveryLineThroughASharedNode()
         {
             var network = TestMap.Create();
-            var brasov = network.GetNode(2);
+            var sibiu = network.GetNode(3);
 
-            // Brasov: end of line 1, start of line 2, middle of line 5.
-            var ids = network.LinesAt(brasov).Select(l => l.Id).OrderBy(i => i).ToArray();
-            CollectionAssert.AreEqual(new[] { 1, 2, 5 }, ids);
+            // Sibiu: start of line 3, end of line 5, end of line 7.
+            var ids = network.LinesAt(sibiu).Select(l => l.Id).OrderBy(i => i).ToArray();
+            CollectionAssert.AreEqual(new[] { 3, 5, 7 }, ids);
         }
 
         [Test]

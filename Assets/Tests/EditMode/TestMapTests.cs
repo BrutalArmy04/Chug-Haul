@@ -15,18 +15,16 @@ namespace ChugHaul.Core.Tests
         private static readonly (int id, string name, NodeKind kind, float x, float z)[] SketchNodes =
         {
             (1, "Bucharest", NodeKind.City, 0f, 0f),
-            (2, "Brasov", NodeKind.City, 1f, 7f),
-            (3, "Sibiu", NodeKind.City, 8f, 7f),
-            (4, "Cluj", NodeKind.City, 9f, 0f),
-            (5, "Farm", NodeKind.Industry, -3f, -2f),
-            (6, "Forest", NodeKind.Industry, 12f, 3f),
-            (7, "Mine", NodeKind.Industry, 11f, 9f),
+            (2, "Brasov", NodeKind.City, 2f, 14f),
+            (3, "Sibiu", NodeKind.City, 16f, 14f),
+            (4, "Cluj", NodeKind.City, 18f, 0f),
+            (5, "Farm", NodeKind.Industry, -6f, -4f),
+            (6, "Forest", NodeKind.Industry, 24f, 6f),
+            (7, "Mine", NodeKind.Industry, 22f, 18f),
         };
 
         private static readonly (int id, int[] stops, int cost)[] SketchLines =
         {
-            (1, new[] { 1, 2 }, 20),
-            (2, new[] { 2, 3 }, 15),
             (3, new[] { 3, 4 }, 25),
             (4, new[] { 1, 4 }, 40),
             (5, new[] { 5, 1, 2, 3 }, 70),
@@ -114,6 +112,40 @@ namespace ChugHaul.Core.Tests
                 Assert.That(line.Stops.Select(n => n.Id).ToArray(), Is.EqualTo(expected.stops),
                     $"line {expected.id}");
                 Assert.That(line.Cost, Is.EqualTo(expected.cost), $"line {expected.id}");
+            }
+        }
+
+        [Test]
+        public void NoTwoLinesShareASegment()
+        {
+            // Two lines on the same track overlap on screen and can't be told apart when clicked.
+            var seen = new HashSet<(int, int)>();
+
+            foreach (Line line in map.Lines)
+            {
+                foreach (Segment segment in line.Segments)
+                {
+                    int a = Math.Min(segment.From.Id, segment.To.Id);
+                    int b = Math.Max(segment.From.Id, segment.To.Id);
+                    Assert.That(seen.Add((a, b)), Is.True, $"segment {a}-{b} is on more than one line");
+                }
+            }
+        }
+
+        [Test]
+        public void EverySegmentIsLongEnoughToClick()
+        {
+            // A node's building is about 3.2 units wide, so on a shorter segment the two
+            // buildings' colliders cover the whole line and it can't be clicked.
+            const float MinLength = 7f;
+
+            foreach (Line line in map.Lines)
+            {
+                foreach (Segment segment in line.Segments)
+                {
+                    Assert.That(segment.Length, Is.GreaterThanOrEqualTo(MinLength),
+                        $"line {line.Id}: {segment.From.Name} - {segment.To.Name}");
+                }
             }
         }
 
