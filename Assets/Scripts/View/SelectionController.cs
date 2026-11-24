@@ -41,12 +41,29 @@ namespace ChugHaul.View
                 HandleClick(hit);
         }
 
+        readonly RaycastHit[] hits = new RaycastHit[16];
+
+        // Trains win: they are small and wait right beside buildings whose bigger, taller colliders
+        // would otherwise hide them. For anything else, the nearest hit.
         SelectableView Pick(Vector2 screenPos)
         {
             Ray ray = cam.ScreenPointToRay(screenPos);
-            if (Physics.Raycast(ray, out var hit, maxDistance, selectableMask, QueryTriggerInteraction.Ignore))
-                return hit.collider.GetComponentInParent<SelectableView>();
-            return null;
+            int count = Physics.RaycastNonAlloc(ray, hits, maxDistance, selectableMask, QueryTriggerInteraction.Ignore);
+
+            SelectableView nearest = null, train = null;
+            float nearestDistance = float.MaxValue, trainDistance = float.MaxValue;
+
+            for (int i = 0; i < count; i++)
+            {
+                var view = hits[i].collider.GetComponentInParent<SelectableView>();
+                if (view == null) continue;
+
+                float distance = hits[i].distance;
+                if (view is TrainView && distance < trainDistance) { train = view; trainDistance = distance; }
+                if (distance < nearestDistance) { nearest = view; nearestDistance = distance; }
+            }
+
+            return train != null ? train : nearest;
         }
 
         void HandleClick(SelectableView target)

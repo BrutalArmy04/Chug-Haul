@@ -975,6 +975,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1579693023}
   - component: {fileID: 1579693024}
+  - component: {fileID: 1579693025}
   m_Layer: 0
   m_Name: SandboxBootstrap
   m_TagString: Untagged
@@ -1009,7 +1010,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f502d50a8d9c54d4c83b09ef5ee0ffe0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: ChugHaul.View::ChugHaul.View.SandboxBootstrap
-  cityPrefab: {fileID: 6064725873271399738, guid: 1472c97d63be6c140804980be703aaa9, type: 3}
+  nodeSpawner: {fileID: 1579693025}
   lineClickablePrefab: {fileID: 8624082566854192154, guid: b866a953fbef569419d7fd03d2a8d56e, type: 3}
   trainPrefab: {fileID: 3036706098301701535, guid: c47ebcdd7aec52142a76d8e400ab7b61, type: 3}
   trainsParent: {fileID: 468164434}
@@ -1019,6 +1020,27 @@ MonoBehaviour:
   hud: {fileID: 1921669222}
   stationPanel: {fileID: 64766666}
   nodePanel: {fileID: 190856950}
+--- !u!114 &1579693025
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1579693022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 05a4eb38495a2c847b47018ed24434f1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: ChugHaul.View::ChugHaul.View.NodeSpawner
+  cityPrefab: {fileID: 6064725873271399738, guid: 1472c97d63be6c140804980be703aaa9, type: 3}
+  industryPrefabs:
+  - cargo: Logs
+    prefab: {fileID: 4184643284563823094, guid: c31dcfa106523b241a1e981c4c09e044, type: 3}
+  fallbackIndustryPrefab: {fileID: 4738098431915879535, guid: ec5e2dbdc8e175d4e8ea8a6c0d63916c, type: 3}
+  factoryPrefab: {fileID: 4738098431915879535, guid: ec5e2dbdc8e175d4e8ea8a6c0d63916c, type: 3}
+  factoryDistance: 2.5
+  stalledMarkerPrefab: {fileID: 3631282584485953376, guid: faee2af92227b48418dc45bfec2090ea, type: 3}
+  stalledMarkerHeight: 2.5
 --- !u!114 &1921669222 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5349362090923857264, guid: 8784bf03d73f4ca4e979435b1db58bb2, type: 3}

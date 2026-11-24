@@ -8,7 +8,7 @@ namespace ChugHaul.View
     // TEMPORARY: sandbox only. Stefan's GameBootstrap replaces this in the main scene.
     public class SandboxBootstrap : MonoBehaviour
     {
-        [SerializeField] GameObject cityPrefab;
+        [SerializeField] NodeSpawner nodeSpawner; // the art for each node kind, and its production feedback
         [SerializeField] GameObject lineClickablePrefab;
         [SerializeField] GameObject trainPrefab;
         [SerializeField] Transform trainsParent; // empty "Trains" object in the scene
@@ -33,12 +33,9 @@ namespace ChugHaul.View
             config = new EconomyConfig();
             economy = new Economy(state, network, config);
 
+            // Before the first Tick: the production feedback must see the first stall events.
             foreach (var node in network.Nodes)
-            {
-                var go = Instantiate(cityPrefab, new Vector3(node.X, 0f, node.Z), Quaternion.identity);
-                go.name = $"City_{node.Id}";
-                go.GetComponent<NodeView>().Init(node.Id);
-            }
+                nodeSpawner.Spawn(node, network, economy);
 
             foreach (var line in network.Lines)
             {
