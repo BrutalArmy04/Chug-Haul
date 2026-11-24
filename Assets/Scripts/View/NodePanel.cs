@@ -96,6 +96,7 @@ namespace ChugHaul.View
             var text = new StringBuilder();
             text.AppendLine(KindText(node));
             AppendProduces(text);
+            AppendStored(text);
             AppendWants(text);
             body.text = text.ToString().TrimEnd();
         }
@@ -130,6 +131,29 @@ namespace ChugHaul.View
                 if (isStalled) text.Append($"  <color=#{orange}>stalled</color>");
                 text.AppendLine();
             }
+        }
+
+        // Cargo dropped here that this node doesn't make: unwanted, or delivered when its demand
+        // was full. It waits in the depot for another train to pick it up (a transfer between lines).
+        void AppendStored(StringBuilder text)
+        {
+            var stored = new List<OfferItem>();
+            foreach (OfferItem item in economy.GetOffer(node))
+                if (!Makes(item.Cargo)) stored.Add(item);
+
+            if (stored.Count == 0) return;
+
+            text.AppendLine().AppendLine("<b>Stored</b>");
+            foreach (OfferItem item in stored)
+                text.AppendLine($"{item.Cargo.Name}  {item.Count}/{config.DepotCapacity}");
+        }
+
+        // By id: the map and the economy each build their own CargoType objects.
+        bool Makes(CargoType cargo)
+        {
+            foreach (CargoType made in node.Produces)
+                if (made.Id == cargo.Id) return true;
+            return node.Factory != null && node.Factory.Output.Id == cargo.Id;
         }
 
         // What the node wants: one pip per free slot, and the price the next wagon would get.
